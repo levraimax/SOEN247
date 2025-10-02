@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <style>
+
+        .prompt {
+            border: 1px solid black;
+            width: fit-content;
+            padding: 1em;
+            display: flex;
+            justify-content:center;
+        }
+
+        .centered {
+            position: relative;
+            display: block;
+            left: 50%;
+            transform: translate(-50%)
+        }
+
+        .centered_text {
+            position: relative;
+            display: block;
+            left: 50%;
+            transform: translate(-50%);
+            text-align: center;
+            margin-bottom: 0
+        }
+
+        .hidden {
+            display: none
+        }
+
+            .hidden * {
+                display: none
+            }
+    </style>
+</head>
+<body>
+
+    <form id="login" class="centered prompt" onsubmit="return login();">
+        <!--Proper application of login: action="/login", have names for the inputs, method="POST" or "GET"-->
+        <h2 class="centered_text">Login</h2>
+        <input name="user" class="centered_text" type="text" placeholder="User">
+        <input name="password" class="centered_text" type="password" placeholder="Password">
+        <a class="centered_text" href="" onclick="return signupToggle()">Signup</a>
+        <input type="submit" style="display:none">
+    </form>
+
+    <form id="signup" class="centered prompt hidden" onsubmit="return signup();">
+        <!--Proper application of signup (sending info to server): action="/signup", have names for the inputs, method="POST" or "GET"-->
+        <h2 class="centered_text">Signup</h2>
+        <input name="user" class="centered_text" type="text" placeholder="User">
+        <input name="pass" class="centered_text" type="password" placeholder="Password">
+        <input name="confirm" class="centered_text" type="password" placeholder="Confirm Password">
+        <a class="centered_text" href="" onclick="return signupToggle();">Return</a>
+        <input type="submit" style="display:none">
+    </form>
+
+
+
+    <script>
+        let logBool = true;
+        const login_form = document.getElementById("login");
+        const signup_form = document.getElementById("signup");
+       
+        const login_field = login_form.user;
+        const pass_field = login_form.password;
+
+        const signupUser = signup_form.user;
+        const signupPass = signup_form.pass;
+        const signupConfirm = signup_form.confirm;
+
+        let authentification = {};  // Temporary user/password storage until backend implementation
+
+
+
+        function post(extension, object = {}) {
+            return fetch("http://localhost:3000/".concat(extension), { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify(object) });
+        }
+
+
+        function login() {
+            // Will need to return true when validated and using /login post/get
+            if (authentification[login_field.value] != undefined && authentification[login_field.value] == pass_field.value) {
+                sessionStorage.setItem("user", login_field.value);  // Use a session cookie instead later
+                window.location.href = "profile.html"
+            };
+            return false
+        }
+
+        function signup() {
+            if (signupUser.value != "" && signupPass.value != "" && signupPass.value == signupConfirm.value) {
+                authentification[signupUser.value] = signupPass.value;
+                signupToggle();
+            }
+            return false
+        }
+
+        function signupToggle() {
+            if (logBool) {
+                login_form.classList.add("hidden");
+                signup_form.classList.remove("hidden");
+            } else {
+                signup_form.classList.add("hidden");
+                login_form.classList.remove("hidden");
+            }
+            logBool = !logBool;
+            return false
+        }
+
+
+
+
+        class Account {
+            static id = 0;
+
+            constructor() {
+                this.surname = null;
+                this.name = null;
+                this.email = null;
+                this.id = Account.id++;
+            }
+
+
+        }
+
+
+    </script>
+</body>
+</html>

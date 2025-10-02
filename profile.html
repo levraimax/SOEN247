@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        html {
+            height: 100%;
+            padding: 2em
+        }
+
+        body {
+            height: 100%;
+            display: flex;
+        }
+
+
+
+        .calendar {
+            width: 70%;
+            height: 100%;
+            border: 1px solid black;
+            margin-right: 1em;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+            .calendar .tab {
+                height: 2%;
+            }
+
+        .day {
+            width: calc(100%/7);
+            height: calc(98%/5);
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+        }
+
+            .day:hover {
+                background-color: #f2f2f2;
+            }
+
+        .booking {
+            width: 25%;
+            height: calc(98%/4);
+            background-color: green;
+            text-align: center;
+            border: 1px solid white;
+            color: white;
+        }
+
+            .booking span {
+                cursor: pointer;
+            }
+
+                .booking span:hover {
+                    font-weight: bold;
+                }
+
+            .booking:hover {
+                background-color: forestgreen;
+            }
+
+        .tab {
+            width: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid black;
+        }
+
+        .profile {
+            height: 100%;
+            flex: 1;
+            border: 1px solid black;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+            .hidden * {
+                display: none;
+            }
+    </style>
+</head>
+
+
+<body onload="displayDays()">
+
+    <div class="calendar" onclick="toggleDayBook(event)">
+        <div class="tab"></div>
+    </div>
+
+    <div class="profile"></div>
+
+
+
+    <script>
+        const dayStrings = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const monthStrings = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const calendar = document.querySelector('.calendar');
+        const tab = calendar.querySelector('.tab');
+        let days = [];
+        let bookings = [];
+        const today = new Date();
+        let month = today.getMonth();
+        let year = today.getFullYear();
+        let day = today.getDate();
+
+        function createDays() {
+            if (days.length == 0) {
+                let weekDay = new Date(year, month, 1).getDay() - 1;
+                for (let i = 0; i < 31; i++) {
+                    calendar.appendChild(document.createElement('div')).classList.add('day')
+                    calendar.lastChild.textContent = `${dayStrings[(weekDay + i) % 7]} ${i + 1}`;
+                    calendar.lastChild.day = `${i + 1}`;
+                    days.push(calendar.lastChild);
+                };
+            }
+        }
+
+
+        function displayDays() {
+            // Create 31 day elements
+            if (days.length == 0) {
+                createDays();
+            } else {
+                days.forEach(day => day.classList.remove("hidden"));
+            }
+            tab.textContent = monthStrings[month];
+        }
+
+        function createBooks() {
+            if (bookings.length == 0) {
+                for (let i = 0; i < 14; i++) {
+                    calendar.appendChild(document.createElement('div')).classList.add("booking");
+                    calendar.lastChild.textContent = `Booking ${i + 8}:00`;
+                    calendar.lastChild.time = `${i + 8}:00`;
+                    displayRooms(calendar.lastChild);
+                    bookings.push(calendar.lastChild);
+                }
+            }
+        }
+
+        function displayBooks() {
+            if (bookings.length == 0) {
+                createBooks();
+            } else {
+                bookings.forEach(booking => booking.classList.remove("hidden"));
+            }
+        }
+
+        function navigateDate(direction) {
+            if (direction) {
+                // Increment month
+                // Check for year incrementation
+                // Update values and displayed text
+            } else {
+                // Decrease month
+                // Check for year change
+                // Update values and displayed text
+            }
+        }
+
+        function getRoomAvailability(time, date) {
+            // Get the rooms based on the time and date
+            return ["Room 1", "Room 2"];
+        }
+
+        function displayRooms(book) {
+            book.innerHTML += "<br>"
+            getRoomAvailability(book.time, book.date).forEach(room => book.innerHTML += `<br><span>${room}</span>`);
+        }
+
+
+
+
+        function toggleDayBook(event) {
+            if (event.target.classList.contains("day")) {
+                //document.querySelectorAll(".day").forEach(day => day.classList.add("hidden"));
+                days.forEach(day => day.classList.add("hidden"));
+                document.querySelector(".tab").textContent = event.target.textContent;
+                displayBooks();
+                day = event.target.day;
+
+
+                //for (let i = 0; i < 14; i++) {
+                //    let booking = document.createElement('div');
+                //    booking.classList.add('booking');
+                //    booking.textContent = `Booking ${i + 8}:00`;
+                //    calendar.appendChild(booking);
+                //}
+            } else if (event.target.classList.contains("booking")) {
+                // Change to display rooms
+                //displayRooms(event.target);
+
+                document.querySelectorAll(".booking").forEach(booking => booking.classList.add("hidden"));
+                document.querySelector(".tab").textContent = month;
+                displayDays();
+
+
+            } else if (event.target.tagName == "SPAN" && event.target.parentElement.classList.contains("booking")) {
+                alert(event.target.textContent);
+            }
+        }
+
+    </script>
+</body>
+</html>
