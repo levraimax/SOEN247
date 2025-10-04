@@ -116,7 +116,7 @@
 
 
     <script>
-        const dayStrings = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const dayStrings = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         const monthStrings = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         const calendar = document.querySelector('.calendar');
         const tab = calendar.querySelector('.tab');
@@ -129,7 +129,7 @@
 
         function createDays() {
             if (days.length == 0) {
-                let weekDay = new Date(year, month, 1).getDay() - 1;
+                let weekDay = new Date(year, month, 1).getDay();
                 for (let i = 0; i < 31; i++) {
                     calendar.appendChild(document.createElement('div')).classList.add('day')
                     calendar.lastChild.textContent = `${dayStrings[(weekDay + i) % 7]} ${i + 1}`;
@@ -153,7 +153,7 @@
 
         function createBooks() {
             if (bookings.length == 0) {
-                for (let i = 0; i < 14; i++) {
+                for (let i = 0; i <= 14; i++) {
                     calendar.appendChild(document.createElement('div')).classList.add("booking");
                     calendar.lastChild.textContent = `Booking ${i + 8}:00`;
                     calendar.lastChild.time = `${i + 8}:00`;
@@ -187,11 +187,23 @@
 
         function updateDates() {
             let date = new Date(year, month, 1);
-            let weekDay = date.getDay() - 1;
+            let weekDay = date.getDay();
+            let last = lastDay(year, month);
+            if (last == 28) {
+                days.forEach(day => day.style.height = "calc(97%/4)");
+            } else {
+                days.forEach(day => day.style.height = "calc(97%/5)");
+            }
+            document.querySelectorAll(".day.hidden").forEach(day => day.classList.remove("hidden"));
             days.forEach((day, index) => {
                 day.textContent = `${dayStrings[(weekDay + index) % 7]} ${index + 1}`;
                 day.day = `${index + 1}`;
+                if (index+1 > last) day.classList.add("hidden");
             });
+        }
+
+        function lastDay(year, month) {
+            return new Date(year, month + 1, 0).getDate();
         }
 
         function getRoomAvailability(time, date) {
@@ -224,7 +236,7 @@
                 //    booking.textContent = `Booking ${i + 8}:00`;
                 //    calendar.appendChild(booking);
                 //}
-            } else if (event.target.id=="backButton") {
+            } else if (event.target.id == "backButton") {
                 // Change to display rooms
                 //displayRooms(event.target);
 
