@@ -28,12 +28,21 @@
         }
 
             .calendar .tab {
-                height: 2%;
+                height: 3%;
             }
+
+        .tab button {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            line-height: calc(50%);
+        }
+
 
         .day {
             width: calc(100%/7);
-            height: calc(98%/5);
+            height: calc(97%/5);
             border: 1px solid black;
             display: flex;
             justify-content: center;
@@ -45,7 +54,7 @@
 
         .booking {
             width: 25%;
-            height: calc(98%/4);
+            height: calc(97%/4);
             background-color: green;
             text-align: center;
             border: 1px solid white;
@@ -65,6 +74,7 @@
             }
 
         .tab {
+            position: relative;
             width: 100%;
             margin: 0;
             display: flex;
@@ -93,7 +103,11 @@
 <body onload="displayDays()">
 
     <div class="calendar" onclick="toggleDayBook(event)">
-        <div class="tab"></div>
+        <div class="tab">
+            <span></span>
+            <button type="button" onclick="navigateDate(1)">></button>
+            <button type="button" style="transform:translate(-100%)" onclick="navigateDate(-1)"><</button>
+        </div>
     </div>
 
     <div class="profile"></div>
@@ -132,7 +146,8 @@
             } else {
                 days.forEach(day => day.classList.remove("hidden"));
             }
-            tab.textContent = monthStrings[month];
+            //tab.textContent = monthStrings[month];
+            document.querySelector(".tab span").textContent = `${monthStrings[month]} ${year}`;
         }
 
         function createBooks() {
@@ -156,15 +171,25 @@
         }
 
         function navigateDate(direction) {
-            if (direction) {
-                // Increment month
-                // Check for year incrementation
-                // Update values and displayed text
-            } else {
-                // Decrease month
-                // Check for year change
-                // Update values and displayed text
+            month += direction;
+            if (month > 11) year += 1;
+            if (month < 0) {
+                year -= 1;
+                month += 12;
             }
+            month = month % 12;
+
+            document.querySelector(".tab span").textContent = `${monthStrings[month]} ${year}`;
+            updateDates();
+        }
+
+        function updateDates() {
+            let date = new Date(year, month, 1);
+            let weekDay = date.getDay() - 1;
+            days.forEach((day, index) => {
+                day.textContent = `${dayStrings[(weekDay + index) % 7]} ${index + 1}`;
+                day.day = `${index + 1}`;
+            });
         }
 
         function getRoomAvailability(time, date) {
@@ -184,7 +209,7 @@
             if (event.target.classList.contains("day")) {
                 //document.querySelectorAll(".day").forEach(day => day.classList.add("hidden"));
                 days.forEach(day => day.classList.add("hidden"));
-                document.querySelector(".tab").textContent = event.target.textContent;
+                document.querySelector(".tab span").textContent = event.target.textContent;
                 displayBooks();
                 day = event.target.day;
 
@@ -200,7 +225,6 @@
                 //displayRooms(event.target);
 
                 document.querySelectorAll(".booking").forEach(booking => booking.classList.add("hidden"));
-                document.querySelector(".tab").textContent = month;
                 displayDays();
 
 
