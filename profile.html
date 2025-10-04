@@ -107,6 +107,7 @@
             <span></span>
             <button type="button" onclick="navigateDate(1)">></button>
             <button type="button" style="transform:translate(-100%)" onclick="navigateDate(-1)"><</button>
+            <button id="backButton" type="button" class="hidden" style="left:0; right:auto">&#8630;</button>
         </div>
     </div>
 
@@ -168,6 +169,7 @@
             } else {
                 bookings.forEach(booking => booking.classList.remove("hidden"));
             }
+            document.getElementById("backButton").classList.remove("hidden");
         }
 
         function navigateDate(direction) {
@@ -208,6 +210,8 @@
         function toggleDayBook(event) {
             if (event.target.classList.contains("day")) {
                 //document.querySelectorAll(".day").forEach(day => day.classList.add("hidden"));
+
+                document.querySelectorAll(".tab button").forEach(button => button.classList.add("hidden"));
                 days.forEach(day => day.classList.add("hidden"));
                 document.querySelector(".tab span").textContent = event.target.textContent;
                 displayBooks();
@@ -220,10 +224,12 @@
                 //    booking.textContent = `Booking ${i + 8}:00`;
                 //    calendar.appendChild(booking);
                 //}
-            } else if (event.target.classList.contains("booking")) {
+            } else if (event.target.id=="backButton") {
                 // Change to display rooms
                 //displayRooms(event.target);
 
+                document.querySelectorAll(".tab button").forEach(button => button.classList.remove("hidden"));
+                document.getElementById("backButton").classList.add("hidden");
                 document.querySelectorAll(".booking").forEach(booking => booking.classList.add("hidden"));
                 displayDays();
 
