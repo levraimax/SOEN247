@@ -145,10 +145,15 @@
             if (days.length == 0) {
                 createDays();
             } else {
-                days.forEach(day => day.classList.remove("hidden"));
+                document.querySelectorAll(".day.hidden").forEach(day => day.classList.remove("hidden"));
             }
             //tab.textContent = monthStrings[month];
             document.querySelector(".tab span").textContent = `${monthStrings[month]} ${year}`;
+            let last = lastDay(year, month);
+            days.forEach((day, index) => {
+                if (index + 1 > last) day.classList.add("hidden");
+            });
+
         }
 
         function createBooks() {
@@ -183,6 +188,7 @@
 
             document.querySelector(".tab span").textContent = `${monthStrings[month]} ${year}`;
             updateDates();
+            displayDays();
         }
 
         function updateDates() {
@@ -198,7 +204,6 @@
             days.forEach((day, index) => {
                 day.textContent = `${dayStrings[(weekDay + index) % 7]} ${index + 1}`;
                 day.day = `${index + 1}`;
-                if (index+1 > last) day.classList.add("hidden");
             });
         }
 
