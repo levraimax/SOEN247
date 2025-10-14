@@ -1,28 +1,30 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Profile Page</title>
-        <link rel="stylesheet" href="../css/profile.css"/>
-        <script src="../js/profile.js"></script>
-    </head>
-    <body>
-        <header>
-            <div class="buttons">
-                <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
-                <input type="button" onclick="showAlert()" id = "logout" value="Log Out">
-            </div>
-            </br>
-            <h1><b>CONCORDIA BOOKING WEBSITE</b></h1>
-            <!-- <p>by Arthur Panoyan, Samuel Charchar, Maxime Charest and George</p> -->
+<head>
+    <title>Profile Page</title>
+    <link rel="stylesheet" href="../css/profile.css" />
+    <script src="../js/profile.js"></script>
+</head>
+<body onload="displayData()">
+    <header>
+        <div class="buttons">
+            <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
+            <input type="button" onclick="showAlert()" id="logout" value="Log Out">
+        </div>
+        </br>
+        <h1><b>CONCORDIA BOOKING WEBSITE</b></h1>
+        <!-- <p>by Arthur Panoyan, Samuel Charchar, Maxime Charest and George</p> -->
 
-        </header>
-        
-        <ul>
-            <li><a href="loged_in.html">Home</a></li>
-            <li><a href="ressources.html">List of Ressources</a></li>
-            <li><a href="calendar.html">Calendar</a></li>
-            <li><a href="booking.html">Bookings</a></li>
-            <li><a href="history.html">History</a></li>
-        </ul>
-    </body>
+    </header>
+
+    <ul>
+        <li><a href="loged_in.html">Home</a></li>
+        <li><a href="ressources.html">List of Ressources</a></li>
+        <li><a href="calendar.html">Calendar</a></li>
+        <li><a href="booking.html">Bookings</a></li>
+        <li><a href="history.html">History</a></li>
+    </ul>
+    <div class="contents">
+    </div>
+</body>
 </html>
