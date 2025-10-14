@@ -1,36 +1,38 @@
 <!DOCTYPE html>
 <html>
-    <head lang="en">
-        <title>Login</title>
-        <link rel="stylesheet" href="../css/signup.css"/>
-        <script src="../js/signup.js"></script>
-    </head>
-    <body>
-        <div class="box">
-            <h1>Create your account </h1>
-            <label for="netname">Enter your Netname:</label>
-            <br/>
-            <input type="text" id="netname" name="netname" placeholder="Netname">
-            <br/>
-            <label for="name">Enter your name: </label>
-            <br/>
-            <input type="text" id="lastName" name="lastName" placeholder="Last">
-            <input type="text" id="firstName" name="firstName" placeholder="First">
-            <br/>
-            <label for="netname">Enter your email address:</label>
-            <br/>
-            <input type="text" id="email" name="email" placeholder="Email address">
-            <br/>
-            <label for="password">Enter your Password:</label>
-            <br/>
-            <input type="text" id="password" name="password" placeholder="Password">
-            <br/>
-            <label for="confirm">Confirm Password:</label>
-            <br/>
-            <input type="text" id="confirm" name="confirm" placeholder="Confirm">
-            <br/>
-            <input type="button" onclick="window.location.href='../html/loged_in.html'" id="signin" value="Sign in">
+<head lang="en">
+    <title>Login</title>
+    <link rel="stylesheet" href="../css/signup.css" />
+    <script src="../js/signup.js"></script>
+</head>
+<body>
+    <div class="box">
 
-        </div>
-    </body>
+        <h1>Create your account </h1>
+        <label for="netname">Enter your Netname:</label>
+        <br />
+        <input type="text" id="netname" name="netname" placeholder="Netname">
+        <br />
+        <label for="name">Enter your name: </label>
+        <br />
+        <input type="text" id="lastName" name="lastName" placeholder="Last">
+        <input type="text" id="firstName" name="firstName" placeholder="First">
+        <br />
+        <label for="netname">Enter your email address:</label>
+        <br />
+        <input type="text" id="email" name="email" placeholder="Email address">
+        <br />
+        <label for="password">Enter your Password:</label>
+        <br />
+        <input type="password" id="password" name="password" placeholder="Password">
+        <br />
+        <label for="confirm">Confirm Password:</label>
+        <br />
+        <input type="password" id="confirm" name="confirm" placeholder="Confirm">
+        <br />
+        <input type="button" onclick="signup()" id="signin" value="Sign in">
+
+
+    </div>
+</body>
 </html>
