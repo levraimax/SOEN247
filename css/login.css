@@ -1,0 +1,47 @@
+body{
+    background-image:url("../img/concordiaBG.png");
+}
+h1{
+    height: 30px;
+    color:rgb(111, 26, 26);
+    text-align: center;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    margin-top: 40px;
+    padding: 10px;
+}
+h3{
+    color:rgb(111, 26, 26);
+    text-align: left;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    margin-bottom: 10px;
+}
+.box{
+    margin-left: 20%;
+    margin-right: 20%;
+    box-shadow: 0 4px 8px rgb(0,0,0.2);
+    padding-left: 10px;
+    padding-bottom:20px;
+    border-radius: 15px;
+    font-size: larger;
+    background-color: aliceblue;
+}
+
+label{
+    margin-top: 10px;
+}
+input{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    width: 90%;
+    height: 25px;
+}
+
+#signin{
+
+    margin-top:10px;
+    height: 40px;
+    width: 91.2%;
+    background-color: rgb(99, 21, 21);
+    color: white;
+    font-size: larger;
+}

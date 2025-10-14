@@ -1,0 +1,38 @@
+body{
+    background-image:url("../img/concordiaBG.png");
+}
+
+.box{
+    margin-left: 20%;
+    margin-right: 20%;
+    box-shadow: 0 4px 8px rgb(0,0,0.2);
+    padding-left: 10px;
+    padding-bottom:20px;
+    border-radius: 15px;
+    font-size: larger;
+    background-color: aliceblue;
+}
+
+input{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 90%;
+    height: 25px;
+}
+#lastName{
+    width: 43.5%;
+}
+#firstName{
+    width: 43.5%;
+}
+
+
+#signin{
+
+    margin-top:10px;
+    height: 40px;
+    width: 91.2%;
+    background-color: rgb(99, 21, 21);
+    color: white;
+    font-size: larger;
+}

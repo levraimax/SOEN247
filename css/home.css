@@ -1,0 +1,63 @@
+body{
+    background-color: aliceblue;
+    margin:0;
+    padding:0;
+}
+
+header{
+    background-color: #a8b3ac;
+    height: 100%;
+    margin-left:0;
+    margin-right: 0;
+    border: 1px solid #a8b3ac;
+    display: block;
+}
+
+.buttons{
+    display: flex;
+    justify-content: flex-end;
+    gap:5px;
+    margin-top: 5px;  
+    margin-right:5px;  
+    margin-bottom:0;
+}
+#adminlogin{
+    background-color: aliceblue;
+    color: black;
+    height: 30px;
+}
+
+#userlogin{
+    background-color: aliceblue;
+    color: black;
+    height: 30px;
+}
+
+#signup{
+    background-color: aliceblue;
+    color: black;
+    height: 30px; 
+}
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333333;
+}
+
+ul li {
+  float: left;
+}
+
+ul li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+ul li a:hover {
+  background-color: #111111;
+}
