@@ -11,7 +11,7 @@ function signup() {
 
 
     if (every(form, (entry) => { return entry.value != "" }) && passwords[0].value == passwords[1].value) {
-        sessionStorage.setItem("user", profileJSON());  // Use a session cookie instead later
+        localStorage.setItem("user", profileJSON());  // Use a session cookie instead later
         window.location.href = '../html/loged_in.html'
     }
 }
