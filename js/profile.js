@@ -1,7 +1,10 @@
 
 
 function displayData() {
-    let data = JSON.parse(localStorage.getItem('user')); // Fetch from server
+    let user = localStorage.getItem('user'); // Fetch from server
+    let serverData = JSON.parse(localStorage.getItem("serverData"));
+    let data = serverData[user];
+   
     data = { "Given Name": data["lastName"], "Name": data["firstName"], "email": data["email"], "Phone Number": data["Phone Number"] || undefined, "Address": data["Address"] || undefined };
 
     let contents = document.querySelector(".contents");
@@ -52,9 +55,10 @@ function validEmail(input) {
 function saveData(event) {
     // Post to server instead
     if (event.target[0].valid == undefined || event.target[0].valid) {
-        let data = JSON.parse(localStorage.getItem('user'));
-        data[event.target[0].name] = event.target[0].value;
-        localStorage.setItem('user', JSON.stringify(data));
+        let user = localStorage.getItem('user');
+        let serverData = JSON.parse(localStorage.getItem("serverData"));
+        serverData[user][event.target[0].name] = event.target[0].value;
+        localStorage.setItem('serverData', JSON.stringify(serverData));
     }
     return false;
 }

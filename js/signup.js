@@ -11,9 +11,22 @@ function signup() {
 
 
     if (every(form, (entry) => { return entry.value != "" }) && passwords[0].value == passwords[1].value) {
-        localStorage.setItem("user", profileJSON());  // Use a session cookie instead later
+        //localStorage.setItem("user", profileJSON());  // Use a session cookie instead later
+        addPrivateData();
         window.location.href = '../html/loged_in.html'
     }
+}
+
+function addPrivateData() {
+    const form = document.querySelectorAll("div input:not([type='button']):not([name='confirm'])");
+    let res = {};
+    form.forEach((entry) => {
+        res[entry.name] = entry.value;
+    });
+    let data = localStorage.getItem("serverData") || {};
+    data[res["netname"]] = res;
+    localStorage.setItem("serverData", JSON.stringify(data));
+    localStorage.setItem("user", res["netname"]);
 }
 
 function profileJSON() {
