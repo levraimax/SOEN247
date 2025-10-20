@@ -95,7 +95,7 @@ function lastDay(year, month) {
 
 function getRoomAvailability(time, date) {
     // Get the rooms based on the time and date
-    return ["Room 1", "Room 2"];
+    return [];
 }
 
 function displayRooms(book) {
@@ -134,6 +134,20 @@ function toggleDayBook(event) {
 
 
     } else if (event.target.tagName == "SPAN" && event.target.parentElement.classList.contains("booking")) {
-        alert(event.target.textContent);
+        let book = event.target.closest(".booking");
+        alert(`${day}/${month}/${year}` + " " + book.time + " " + event.target.textContent);
+        //alert(event.target.textContent);
+        addBooking(`${day}/${month}/${year}`, book.time, event.target.textContent);
     }
+}
+
+function addBooking(date, time, resource) {
+    let user = localStorage.getItem('user');
+    let serverData = JSON.parse(localStorage.getItem("serverData"));
+    serverData[user]["bookings"].push({ "date": date, "time": time, "resource": resource });
+
+    // Set the resource as unavailable and submit for approval if required.
+
+
+    localStorage.setItem("serverData", JSON.stringify(serverData));
 }
