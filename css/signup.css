@@ -26,7 +26,24 @@ input{
     width: 43.5%;
 }
 
+.role {
+  text-align: left;
+  margin-left: 5%;
+  margin-top: 10px;
+}
 
+.role label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 15px; /* space between User and Admin */
+  font-size: large;
+}
+
+.role input[type="radio"] {
+  margin-right: 5px; /* space between checkbox and text */
+  width: auto;       /* overrides your global input width */
+  height: auto;
+}
 #signin{
 
     margin-top:10px;

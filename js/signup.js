@@ -37,3 +37,22 @@ function profileJSON() {
     });
     return JSON.stringify(res);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+  const signInButton = document.getElementById("signin");
+
+  signInButton.addEventListener("click", function() {
+    const selectedRole = document.querySelector('input[name="role"]:checked');
+
+    if (!selectedRole) {
+      alert("Please select a role before signing in!");
+      return;
+    }
+
+    if (selectedRole.value === "admin") {
+      window.location.href = "../html/adminLoged_in.html";
+    } else if (selectedRole.value === "user") {
+      window.location.href = "../html/userLoged_in.html";
+    }
+  });
+});

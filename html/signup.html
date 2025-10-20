@@ -29,8 +29,12 @@
         <label for="confirm">Confirm Password:</label>
         <br />
         <input type="password" id="confirm" name="confirm" placeholder="Confirm">
-        <br />
-        <input type="button" onclick="signup()" id="signin" value="Sign in">
+        <div class="role">
+            <label><input type="radio" name="role" value="user">User</label>
+            <label><input type="radio" name="role" value="admin">Admin</label>
+        </div>
+        <br/>
+        <input type="button" id="signin" value="Sign in">
 
 
     </div>
