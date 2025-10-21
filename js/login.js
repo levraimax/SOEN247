@@ -15,7 +15,14 @@ function login() {
 
     if (serverData[netname]["password"] == password) {
         localStorage.setItem("user", netname);
-        window.location.href = '../html/loged_in.html';
+        //window.location.href = '../html/userLoged_in.html';
+
+        alert("User admin not implemented yet for testing convenience");
+        if (window.location.href.includes("aLogin.html")) {
+            window.location.href ='../html/adminLoged_in.html'
+        } else {
+            window.location.href = '../html/userLoged_in.html';
+        }
     }
 
     return false;

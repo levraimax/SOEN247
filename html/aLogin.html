@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Login Page</title>
-        <link rel="stylesheet" href="../css/login.css"/>
-        <script src="../js/login.js"></script>
-    </head>
-    <body>
-        <div class="box">
+<head>
+    <title>Login Page</title>
+    <link rel="stylesheet" href="../css/login.css" />
+    <script src="../js/login.js"></script>
+</head>
+<body>
+    <div class="box">
+        <form onsubmit="return login()">
             <h1>Concordia Booking</h1>
             <h3>Admin Login</h3>
             <label for="netname">Netname:</label>
-            <br/>
+            <br />
             <input type="text" id="netname" name="netname" placeholder="Netname">
-            <br/>
+            <br />
             <label for="password">Password:</label>
-            <br/>
-            <input type="text" id="password" name="password" placeholder="Password">
-            <br/>
-            <input type="button" onclick="window.location.href='../html/adminLoged_in.html'" id="signin" value="Sign in">
-        </div>
-    </body>
+            <br />
+            <input type="password" id="password" name="password" placeholder="Password">
+            <br />
+            <input type="button" onclick="login()" id="signin" value="Sign in">
+            <input type="submit" style="display:none">
+        </form>
+    </div>
+</body>
 </html>

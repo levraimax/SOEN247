@@ -44,7 +44,7 @@ function createBooks() {
             calendar.appendChild(document.createElement('div')).classList.add("booking");
             calendar.lastChild.textContent = `Booking ${i + 8}:00`;
             calendar.lastChild.time = `${i + 8}:00`;
-            displayRooms(calendar.lastChild);
+            //displayRooms(calendar.lastChild);
             bookings.push(calendar.lastChild);
         }
     }
@@ -56,6 +56,7 @@ function displayBooks() {
     } else {
         bookings.forEach(booking => booking.classList.remove("hidden"));
     }
+    bookings.forEach(book => displayRooms(book));
     document.getElementById("backButton").classList.remove("hidden");
 }
 
@@ -95,12 +96,15 @@ function lastDay(year, month) {
 
 function getRoomAvailability(time, date) {
     // Get the rooms based on the time and date
-    return [];
+    let availabilities = JSON.parse(localStorage.getItem("availabilities"));
+    if (availabilities[date] == null || availabilities[date][time] == null) return [];
+    return availabilities[date][time].map(entry => entry.resource);
 }
 
 function displayRooms(book) {
-    book.innerHTML += "<br>"
-    getRoomAvailability(book.time, book.date).forEach(room => book.innerHTML += `<br><span>${room}</span>`);
+    console.log(book.time,date)
+    book.innerHTML = `Booking ${book.time}<br>`;
+    getRoomAvailability(book.time, date).forEach(room => book.innerHTML += `<br><span>${room}</span>`);
 }
 
 
@@ -109,12 +113,13 @@ function displayRooms(book) {
 function toggleDayBook(event) {
     if (event.target.classList.contains("day")) {
         //document.querySelectorAll(".day").forEach(day => day.classList.add("hidden"));
-
+        day = event.target.day;
+        date = `${day}/${month + 1}/${year}`;
         document.querySelectorAll(".tab button").forEach(button => button.classList.add("hidden"));
         days.forEach(day => day.classList.add("hidden"));
         document.querySelector(".tab span").textContent = event.target.textContent;
         displayBooks();
-        day = event.target.day;
+        
 
 
         //for (let i = 0; i < 14; i++) {
@@ -137,7 +142,7 @@ function toggleDayBook(event) {
         let book = event.target.closest(".booking");
         alert(`${day}/${month}/${year}` + " " + book.time + " " + event.target.textContent);
         //alert(event.target.textContent);
-        addBooking(`${day}/${month}/${year}`, book.time, event.target.textContent);
+        addBooking(`${day}/${month+1}/${year}`, book.time, event.target.textContent);
     }
 }
 
@@ -146,8 +151,6 @@ function addBooking(date, time, resource) {
     let serverData = JSON.parse(localStorage.getItem("serverData"));
     serverData[user]["bookings"].push({ "date": date, "time": time, "resource": resource });
 
-    // Set the resource as unavailable and submit for approval if required.
-
-
+    // Set the resource as unavailable and submit for approval if required
     localStorage.setItem("serverData", JSON.stringify(serverData));
 }

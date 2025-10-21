@@ -3,11 +3,11 @@
 <head>
     <title>Main page</title>
     <meta charset="utf8" />
-    <link rel="stylesheet" href="../css/loged_in.css" />
-    <script src="../js/loged_in.js"></script>
+    <link rel="stylesheet" href="../css/adminBookings.css" />
+    <script src="../js/adminBookings.js"></script>
     <script src="../js/logout.js"></script>
 </head>
-<body>
+<body onload="displayBookings()">
     <header>
         <div class="buttons">
             <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
@@ -28,6 +28,20 @@
     </ul>
 
 
-    <div class="contents"></div>
+    <div class="contents">
+        <div class="listings" onclick="buttonClick(event.target)"></div>
+        <div class="sidebar">
+            <form class="creation" onsubmit="return createBooking()">
+                <input type="text" name="resource" placeholder="Resource">
+                <input type="time" name="time">
+                <input type="date" name="date">
+                <span>Requires authorization: </span>
+                <input type="checkbox" name="auth" placeholder="auth">
+                <input type="submit">
+                
+            </form>
+            <div class="requests"></div>
+        </div>
+    </div>
 </body>
 </html>

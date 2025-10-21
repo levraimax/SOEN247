@@ -7,35 +7,36 @@
 </head>
 <body>
     <div class="box">
-
-        <h1>Create your account </h1>
-        <label for="netname">Enter your Netname:</label>
-        <br />
-        <input type="text" id="netname" name="netname" placeholder="Netname">
-        <br />
-        <label for="name">Enter your name: </label>
-        <br />
-        <input type="text" id="lastName" name="lastName" placeholder="Last">
-        <input type="text" id="firstName" name="firstName" placeholder="First">
-        <br />
-        <label for="netname">Enter your email address:</label>
-        <br />
-        <input type="text" id="email" name="email" placeholder="Email address">
-        <br />
-        <label for="password">Enter your Password:</label>
-        <br />
-        <input type="password" id="password" name="password" placeholder="Password">
-        <br />
-        <label for="confirm">Confirm Password:</label>
-        <br />
-        <input type="password" id="confirm" name="confirm" placeholder="Confirm">
-        <div class="role">
-            <label><input type="radio" name="role" value="user">User</label>
-            <label><input type="radio" name="role" value="admin">Admin</label>
-        </div>
-        <br/>
-        <input type="button" id="signin" value="Sign in">
-
+        <form onsubmit="return signup()">
+            <h1>Create your account </h1>
+            <label for="netname">Enter your Netname:</label>
+            <br />
+            <input type="text" id="netname" name="netname" placeholder="Netname">
+            <br />
+            <label for="name">Enter your name: </label>
+            <br />
+            <input type="text" id="lastName" name="lastName" placeholder="Last">
+            <input type="text" id="firstName" name="firstName" placeholder="First">
+            <br />
+            <label for="netname">Enter your email address:</label>
+            <br />
+            <input type="text" id="email" name="email" placeholder="Email address">
+            <br />
+            <label for="password">Enter your Password:</label>
+            <br />
+            <input type="password" id="password" name="password" placeholder="Password">
+            <br />
+            <label for="confirm">Confirm Password:</label>
+            <br />
+            <input type="password" id="confirm" name="confirm" placeholder="Confirm">
+            <div class="role">
+                <label><input type="radio" name="role" value="user">User</label>
+                <label><input type="radio" name="role" value="admin">Admin</label>
+            </div>
+            <br />
+            <input type="button" id="signin" onclick="signup()" value="Sign in">
+            <input type="submit" style="display:none">
+        </form>
 
     </div>
 </body>

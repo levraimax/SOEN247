@@ -6,20 +6,26 @@ function every(arr, func) {
 }
 
 function signup() {
-    const form = document.querySelectorAll("div input:not([type='button'])");
+    const form = document.querySelectorAll("div input[type='text']");
     const passwords = document.querySelectorAll("div input[type='password']");
+    const roles = document.querySelectorAll("div input[type='radio']:checked");
+
+    let availabilities = localStorage.getItem("availabilities");
+    if (availabilities == null) localStorage.setItem("availabilities", "{}");
 
 
-    if (every(form, (entry) => { return entry.value != "" }) && passwords[0].value == passwords[1].value) {
+    if (every(form, (entry) => { return entry.value != "" }) && passwords[0].value == passwords[1].value && roles.length != 0) {
         //localStorage.setItem("user", profileJSON());  // Use a session cookie instead later
         addPrivateData();
-        window.location.href = '../html/loged_in.html'
+        window.location.href = '../html/home.html'
     }
+
+    return false;
 }
 
 function addPrivateData() {
     const form = document.querySelectorAll("div input:not([type='button']):not([name='confirm'])");
-    let res = {"bookings":[]};
+    let res = { "bookings": [] };
     form.forEach((entry) => {
         res[entry.name] = entry.value;
     });
@@ -39,21 +45,4 @@ function profileJSON() {
     return JSON.stringify(res);
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-  const signInButton = document.getElementById("signin");
 
-  signInButton.addEventListener("click", function() {
-    const selectedRole = document.querySelector('input[name="role"]:checked');
-
-    if (!selectedRole) {
-      alert("Please select a role before signing in!");
-      return;
-    }
-
-    if (selectedRole.value === "admin") {
-      window.location.href = "../html/adminLoged_in.html";
-    } else if (selectedRole.value === "user") {
-      window.location.href = "../html/userLoged_in.html";
-    }
-  });
-});

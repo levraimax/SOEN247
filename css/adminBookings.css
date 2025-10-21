@@ -1,0 +1,153 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    background-color: aliceblue;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: #a8b3ac;
+    margin-left: 0;
+    margin-right: 0;
+    border: 1px solid #a8b3ac;
+    display: block;
+}
+
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 0;
+}
+
+#adminlogin {
+    background-color: aliceblue;
+    color: black;
+    height: 30px;
+}
+
+#userlogin {
+    background-color: aliceblue;
+    color: black;
+    height: 30px;
+}
+
+#signup {
+    background-color: aliceblue;
+    color: black;
+    height: 30px;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333333;
+}
+
+    ul li {
+        float: left;
+    }
+
+        ul li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+            ul li a:hover {
+                background-color: #111111;
+            }
+
+.contents {
+    height: 100%;
+    width: 70%;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+    background-color: yellow;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: flex-start;
+}
+
+.sidebar {
+    width: calc(100%/3);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.creation {
+    width:100%;
+    height:50%;
+    padding:4%;
+}
+
+.creation *{
+    margin-bottom:2px;
+}
+
+
+.requests {
+    width:100%;
+    height:50%;
+    background-color:orange;
+    overflow:auto;
+}
+
+.listings {
+    width:calc(100%*2/3);
+    height:100%;
+    background-color:green;
+}
+
+.booking {
+    width: 100%;
+    height: calc(100%/14);
+    display: flex;
+    flex-direction: row;
+    background-color: green;
+}
+
+    .booking div {
+        width: calc(100%/3);
+        height: 100%;
+        border: 1px solid black;
+        padding-top: 1%;
+        padding-bottom: 1%;
+        color: white;
+        padding-left: 2.5%;
+    }
+
+    .booking:hover div {
+        width: calc(80%/3);
+    }
+
+    .booking:hover button {
+        display: block;
+        width: 10%;
+    }
+
+
+
+    .booking:not(hover) button {
+        display: none;
+    }
