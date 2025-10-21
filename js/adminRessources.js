@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const editResCap = document.getElementById('editResCap');
     const editSaveBtn = document.getElementById('editSaveBtn');
     const editCancelBtn = document.getElementById('editCancelBtn');
+    const removeBtn = document.getElementById('removeBtn');
+    const blockBtn = document.getElementById('blockBtn')
 
     const createBtn = document.getElementById('create');
     const createModal = document.getElementById('createModal');
@@ -32,6 +34,18 @@ document.addEventListener('DOMContentLoaded', () => {
         editModal.style.display = 'block';
     }
 
+    function applyBlockAppearance(imgEl){
+        const blocked = imgEl.dataset.blocked == 'true';
+        if(blocked){
+            imgEl.classList.add('blocked');
+            imgEl.title= (imgEl.dataset.name || 'Resource') +'- Blocked';
+        }
+        else{
+            imgEl.classList.remove('blocked');
+            imgEl.title = imgEl.dataset.name || 'Resource';
+        }
+    }
+
     function attachResourceClickHandlers(root = contentsDiv) {
         root.querySelectorAll('img:not(#create)').forEach(img => {
             img.replaceWith(img.cloneNode(true));
@@ -49,12 +63,50 @@ document.addEventListener('DOMContentLoaded', () => {
         currentResource.dataset.description = editResDesc.value;
         currentResource.dataset.location = editResLoc.value;
         currentResource.dataset.capacity = editResCap.value;
+        currentResource.dataset.capacity = editResCap.value;
+        applyBlockAppearance(currentResource);
         editModal.style.display = 'none';
         alert('Resource updated!');
     });
 
     editCancelBtn.addEventListener('click', () => {
         editModal.style.display = 'none';
+    });
+
+    removeBtn.addEventListener('click',()=>{
+        if(!currentResource)return;
+        const name = currentResource.dataset.name || 'this resource';
+        const confirmed = confirm('Are your sure you want to delete ' + name + '?');
+        if(!confirmed)return;
+        currentResource.remove();
+        editModal.style.display='none';
+        currentResource=null;
+        alert('Resource deleted.');
+    });
+
+    blockBtn.addEventListener('click',()=>{
+        if(!currentResource)return;
+        const currentlyBlocked = currentResource.dataset.blocked =='true';
+        const name = currentResource.dataset.name || 'this resource';
+
+        if(!currentlyBlocked){
+            const confirmed = confirm('Are you sure you want to block ' + name + '?');
+            if(!confirmed) return;
+            currentResource.dataset.blocked='true';
+            applyBlockAppearance(currentResource);
+            blockBtn.textContent='Unblock';
+            alert(name + ' is now blocked');
+            editModal.style.display = 'none';
+        }
+        else{
+            const confirmed = confirm('Unblock' + name + '?');
+            if(!confirm)return;
+            currentResource.dataset.blocked = 'false';
+            applyBlockAppearance(currentResource);
+            blockBtn.textContent='Block';
+            alert(name + 'is now unblocked.');
+            editModal.style.display = 'none';
+        }
     });
 
     createBtn.addEventListener('click', () => {
@@ -141,6 +193,9 @@ document.addEventListener('DOMContentLoaded', () => {
         attachResourceClickHandlers(contentsDiv);
     });
 
+
+
+    
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (editModal.style.display === 'block') editModal.style.display = 'none';

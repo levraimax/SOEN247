@@ -100,7 +100,6 @@ ul li a:hover {
     left:35%;
     background:white;
     border:1px solid black;
-    padding:20px;
     z-index:1000;
     width:400px;
 }
@@ -110,4 +109,9 @@ ul li a:hover {
     display:flex; align-items:center; justify-content:center;
     background-size:cover;
     background-position:center;
+}
+
+img.blocked{
+    filter:grayscale(100%) brightness(60%);
+    transform: filter 0.3s ease;
 }
