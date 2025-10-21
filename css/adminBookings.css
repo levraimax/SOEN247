@@ -151,3 +151,7 @@ ul {
     .booking:not(hover) button {
         display: none;
     }
+
+.hidden {
+    display: none;
+}

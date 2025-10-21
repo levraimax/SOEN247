@@ -31,15 +31,18 @@
     <div class="contents">
         <div class="listings" onclick="buttonClick(event.target)"></div>
         <div class="sidebar">
-            <form class="creation" onsubmit="return createBooking()">
-                <input type="text" name="resource" placeholder="Resource">
-                <input type="time" name="time">
-                <input type="date" name="date">
-                <span>Requires authorization: </span>
-                <input type="checkbox" name="auth" placeholder="auth">
-                <input type="submit">
-                
-            </form>
+            <div class="creation">
+                <form onsubmit="createBooking()">
+                    <input type="text" name="resource" placeholder="Resource">
+                    <input type="time" name="time">
+                    <input type="date" name="date">
+                    <span>Requires authorization: </span>
+                    <input type="checkbox" name="auth" placeholder="auth">
+                    <input type="submit" id="submit">
+                </form>
+                <button id="save" class="hidden" onclick="buttonModifyClick(event.target)">Save</button>
+                <button id="back" class="hidden" onclick="buttonModifyClick(event.target)">Back</button>
+            </div>
             <div class="requests"></div>
         </div>
     </div>

@@ -4,6 +4,7 @@ let time;
 let date;
 let auth;
 let loaded = false;
+let toModify;
 function displayBookings() {
     if (!loaded) {
         loaded = true;
@@ -45,7 +46,7 @@ function displayBooking(book) {
 
 function createBooking() {
     let dateValue = date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1");
-    let authValue = auth == "on";
+    let authValue = auth.checked;
 
     let serverListings = JSON.parse(localStorage.getItem("listings"));
     let data = { "resource": resource.value, "time": time.value, "date": dateValue, auth: authValue };
@@ -58,6 +59,7 @@ function createBooking() {
     availabilities[dateValue][time.value].push(data);
     localStorage.setItem("availabilities", JSON.stringify(availabilities));
 
+    clear();
     displayBookings();
     return false;
 }
@@ -80,13 +82,75 @@ function remove(arr, target) {
     if (x != -1) arr.splice(x, 1);
 }
 
+function buttonModifyClick(button) {
+    switch (button.textContent) {
+        case "Save":
+            // Change the listings and availabilities to reflect the data of this booking
+            // Requires modifying the user's bookings too
+
+            let res = { "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1"), "auth": auth.checked }
+
+            // Listing
+            let listings = JSON.parse(localStorage.getItem("listings"));
+            listings[indexOfBook(listings, toModify.data)] = res;
+            // Availabilities
+            let availabilities = JSON.parse(localStorage.getItem("availabilities"));
+
+            if (toModify.data.date == res.date && toModify.data.time == res.time) {
+                availabilities[res.date][res.time][indexOfBook(availabilities[res.date][res.time], toModify.data)] = res;
+            } else {
+                remove(availabilities[toModify.data.date][toModify.data.time], toModify.data);
+                if (availabilities[res.date] == undefined) availabilities[res.date] = {};
+                if (availabilities[res.date][res.time] == undefined) availabilities[res.date][res.time] = [];
+                availabilities[res.date][res.time].push(res);
+            }
+
+            toModify.data = res;
+
+            localStorage.setItem("listings", JSON.stringify(listings));
+            localStorage.setItem("availabilities", JSON.stringify(availabilities));
+
+            document.getElementById("submit").classList.remove("hidden");
+            document.querySelectorAll(".creation button").forEach(btn => btn.classList.add("hidden"));
+            clear()
+            displayBookings();
+
+            // User
+            alert("user modification not implemented, will require user reference when booking");
+
+
+            break;
+        case "Back":
+            document.getElementById("submit").classList.remove("hidden");
+            document.querySelectorAll(".creation button").forEach(btn => btn.classList.add("hidden"));
+            clear();
+            break;
+    }
+    toModify = null;
+}
+
+function clear() {
+    resource.value = "";
+    time.value = "";
+    date.value = "";
+    auth.checked = false;
+}
+
 function buttonClick(button) {
-    let data = button.closest(".booking").data;
+    toModify = button.closest(".booking");
+    let data = toModify.data;
 
     switch (button.textContent) {
         case "Modify":
-            alert(button.textContent + ", " + data.resource + " " + data.time + " " + data.date);
+            //alert(button.textContent + ", " + data.resource + " " + data.time + " " + data.date);
+            resource.value = data.resource;
+            time.value = data.time;
+            date.value = data.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1");
+            auth.checked = data.auth;
 
+
+            document.getElementById("submit").classList.add("hidden");
+            document.querySelectorAll(".creation button").forEach(btn => btn.classList.remove("hidden"));
             //Modifying allows to modify the contents
             // -Resource
             // -Time
@@ -104,6 +168,12 @@ function buttonClick(button) {
             let availabilities = JSON.parse(localStorage.getItem("availabilities"));
             remove(availabilities[data.date][data.time], data);
             localStorage.setItem("availabilities", JSON.stringify(availabilities));
+
+            if (toModify != null) {
+                document.getElementById("submit").classList.remove("hidden");
+                document.querySelectorAll(".creation button").forEach(btn => btn.classList.add("hidden"));
+                clear();
+            }
 
             break;
     }
