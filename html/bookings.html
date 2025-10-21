@@ -7,7 +7,7 @@
     <script src="../js/bookings.js"></script>
     <script src="../js/logout.js"></script>
 </head>
-    <body>
+    <body onload="loaded()">
         <header>
             <div class="buttons">
                 <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
@@ -28,6 +28,6 @@
         </ul>
 
         
-        <div class="contents"></div>
+        <div class="contents" onclick="buttonClick(event.target)"></div>
     </body>
 </html>
