@@ -1,3 +1,9 @@
+let availabilities = localStorage.getItem("availabilities");
+if (availabilities == null) localStorage.setItem("availabilities", "{}");
+let requests = localStorage.getItem("requests");
+if (requests == null) localStorage.setItem("requests", "[]");
+
+
 function every(arr, func) {
     for (let i in arr) {
         if (!func(arr[i])) return false;
@@ -10,8 +16,6 @@ function signup() {
     const passwords = document.querySelectorAll("div input[type='password']");
     const roles = document.querySelectorAll("div input[type='radio']:checked");
 
-    let availabilities = localStorage.getItem("availabilities");
-    if (availabilities == null) localStorage.setItem("availabilities", "{}");
 
 
     if (every(form, (entry) => { return entry.value != "" }) && passwords[0].value == passwords[1].value && roles.length != 0) {

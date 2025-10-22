@@ -1,18 +1,37 @@
-let contents;
+let user, listings, creation, resource, time, date, toModify, rResource, rDate, rTime;
+let loaded = false;
 function displayBookings() {
-    contents = document.querySelector(".contents");
-    contents.textContent = "";
-    const user = localStorage.getItem("user");
-    const data = JSON.parse(localStorage.getItem("serverData"));
+    if (!loaded) {
+        loaded = true;
+        listings = document.querySelector(".listings");
+        creation = document.querySelector(".creation");
+        user = localStorage.getItem("user");
+        resource = document.querySelector("input[name='resource']");
+        time = document.querySelector("input[name='time']");
+        date = document.querySelector("input[name='date']");
+        rResource = document.querySelector("input[name='requestResource']");
+        rTime = document.querySelector("input[name='requestTime']");
+        rDate = document.querySelector("input[name='requestDate']");
+    }
+
+    listings.textContent = "";
+    let data = localStorage.getItem("serverData");
+    if (data != null) {
+        data = JSON.parse(data);
+    } else {
+        localStorage.setItem("listings", "[]");
+    }
 
     for (let book of data[user]["bookings"]) {
         displayBooking(book);
     }
+
 }
 
 function displayBooking(book) {
-    contents.appendChild(document.createElement("div")).classList.add("booking");
-    let booking = contents.lastChild;
+    //listings.textContent = "";
+    listings.appendChild(document.createElement("div")).classList.add("booking");
+    let booking = listings.lastChild;
     booking.data = book;
     booking.appendChild(document.createElement("div")).textContent = book.resource;
     booking.appendChild(document.createElement("div")).textContent = book.time;
@@ -22,6 +41,7 @@ function displayBooking(book) {
     right.textContent = "Cancel";
     right.classList.add("right");
 }
+
 
 function indexOfBook(arr, book) {
     for (let i in arr) {
@@ -40,12 +60,92 @@ function remove(arr, target) {
     if (x != -1) arr.splice(x, 1);
 }
 
+function showSidebar(visibility = true) {
+    if (visibility) {
+        //listings.style.width = "calc(70%*2/3)";
+        creation.classList.remove("hidden");
+    } else {
+        //listings.style.width = "70%";
+        creation.classList.add("hidden");
+    }
+}
+
+function requestClick(button) {
+    switch (button.textContent) {
+        case "Submit":
+            let res = { "user": user, "resource": rResource.value, "time": rTime.value, "date": rDate.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
+
+            // Check if it is in listings (and not auth)
+
+            // Add it to the requests
+            let serverRequests = localStorage.getItem("requests");
+            if (serverRequests == null) serverRequests = [];
+            serverRequests.push(res)
+            localStorage.setItem("requests", JSON.stringify(serverRequests));
+            break;
+    }
+    clearRequests();
+}
+
+function buttonModifyClick(button) {
+    switch (button.textContent) {
+        case "Save":
+            // Change the listings and availabilities to reflect the data of this booking
+            // Requires modifying the user's bookings too
+
+            let res = { "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
+
+            let serverData = JSON.parse(localStorage.getItem("serverData"));
+            let index = indexOfBook(serverData[user]["bookings"], toModify.data);
+            console.log(index);
+            serverData[user]["bookings"][index] = res;
+            console.log(serverData);
+            localStorage.setItem("serverData", JSON.stringify(serverData));
+
+            toModify.data = res;
+
+
+
+            displayBookings();
+
+
+
+
+            break;
+        case "Back":
+            //clear();
+            //showSidebar(false);
+            break;
+    }
+    clear()
+    showSidebar(false);
+    toModify = null;
+}
+
+function clear() {
+    resource.value = "";
+    time.value = "";
+    date.value = "";
+}
+
+function clearRequests() {
+    rResource.value = "";
+    rTime.value = "";
+    rDate.value = "";
+}
+
 function buttonClick(button) {
-    let data = button.closest(".booking").data;
-    
+    toModify = button.closest(".booking");
+    let data = toModify.data;
+
     switch (button.textContent) {
         case "Modify":
-            alert(button.textContent + ", " + data.resource + " " + data.time + " " + data.date);
+            //alert(button.textContent + ", " + data.resource + " " + data.time + " " + data.date);
+            showSidebar();
+            resource.value = data.resource;
+            time.value = data.time;
+            date.value = data.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1");
+
 
             //Modifying allows to modify the contents
             // -Resource
@@ -57,11 +157,14 @@ function buttonClick(button) {
 
             break;
         case "Cancel":
-            let user = localStorage.getItem('user');
             let serverData = JSON.parse(localStorage.getItem("serverData"));
             remove(serverData[user]["bookings"], data);
             localStorage.setItem("serverData", JSON.stringify(serverData));
 
+            if (toModify != null) {
+                clear();
+                showSidebar(false);
+            }
 
             break;
     }

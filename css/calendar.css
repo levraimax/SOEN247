@@ -130,6 +130,7 @@ ul {
     text-align: center;
     border: 1px solid white;
     color: white;
+    overflow:auto;
 }
 
     .booking span {

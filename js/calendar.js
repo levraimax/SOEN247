@@ -2,12 +2,17 @@ const dayStrings = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Fri
 const monthStrings = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const calendar = document.querySelector('.calendar');
 const tab = calendar.querySelector('.tab');
+
 let days = [];
 let bookings = [];
 const today = new Date();
 let month = today.getMonth();
 let year = today.getFullYear();
 let day = today.getDate();
+
+//function calcMaxHeight() {
+//    calendar.style.maxHeight = calendar.clientHeight+"px"
+//}
 
 function createDays() {
     if (days.length == 0) {
@@ -102,7 +107,7 @@ function getRoomAvailability(time, date) {
 }
 
 function displayRooms(book) {
-    console.log(book.time,date)
+    //console.log(book.time,date)
     book.innerHTML = `Booking ${book.time}<br>`;
     getRoomAvailability(book.time, date).forEach(room => book.innerHTML += `<br><span>${room}</span>`);
 }

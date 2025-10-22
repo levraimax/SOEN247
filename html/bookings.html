@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Bookings</title>
+    <title>Main page</title>
     <meta charset="utf8" />
     <link rel="stylesheet" href="../css/booking.css" />
     <script src="../js/bookings.js"></script>
@@ -20,14 +20,36 @@
     </header>
 
     <ul>
-        <li><a href="home.html">Home</a></li>
+        <li><a href="userLoged_in.html">Home</a></li>
         <li><a href="ressources.html">List of Ressources</a></li>
         <li><a href="calendar.html">Calendar</a></li>
         <li><a href="bookings.html">Bookings</a></li>
         <li><a href="history.html">History</a></li>
     </ul>
 
-
-    <div class="contents" onclick="buttonClick(event.target)"></div>
+    <div class="contents">
+        <div class="sidebar">
+            <div class="requests">
+                <p class="centered"> File Requests</p>
+                <input type="text" name="requestResource" placeholder="Resource">
+                <input type="time" name="requestTime">
+                <input type="date" name="requestDate">
+                <br>
+                <button onclick="requestClick(event.target)">Submit</button>
+                <button onclick="requestClick(event.target)">Clear</button>
+            </div>
+        </div>
+        <div class="listings" onclick="buttonClick(event.target)"></div>
+        <div class="sidebar">
+            <div class="creation hidden">
+                <input type="text" name="resource" placeholder="Resource">
+                <input type="time" name="time">
+                <input type="date" name="date">
+                <br>
+                <button id="save" onclick="buttonModifyClick(event.target)">Save</button>
+                <button id="back" onclick="buttonModifyClick(event.target)">Back</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
