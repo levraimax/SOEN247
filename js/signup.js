@@ -21,7 +21,7 @@ function signup() {
     if (every(form, (entry) => { return entry.value != "" }) && passwords[0].value == passwords[1].value && roles.length != 0) {
         //localStorage.setItem("user", profileJSON());  // Use a session cookie instead later
         addPrivateData();
-        window.location.href = '../html/home.html'
+        window.location.href = '../html/profile.html'
     }
 
     return false;
@@ -29,7 +29,7 @@ function signup() {
 
 function addPrivateData() {
     const form = document.querySelectorAll("div input:not([type='button']):not([name='confirm'])");
-    let res = { "bookings": [] };
+    let res = { "bookings": [], "pending": [] };
     form.forEach((entry) => {
         res[entry.name] = entry.value;
     });

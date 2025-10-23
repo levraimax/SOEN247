@@ -15,15 +15,14 @@ function displayBookings() {
     }
 
     listings.textContent = "";
-    let data = localStorage.getItem("serverData");
-    if (data != null) {
-        data = JSON.parse(data);
-    } else {
-        localStorage.setItem("listings", "[]");
-    }
+    let data = JSON.parse(localStorage.getItem("serverData"));
 
     for (let book of data[user]["bookings"]) {
         displayBooking(book);
+    }
+
+    for (let pending of data[user]["pending"]) {
+        displayPending(pending);
     }
 
 }
@@ -36,6 +35,21 @@ function displayBooking(book) {
     booking.appendChild(document.createElement("div")).textContent = book.resource;
     booking.appendChild(document.createElement("div")).textContent = book.time;
     booking.appendChild(document.createElement("div")).textContent = book.date;
+    booking.appendChild(document.createElement("button")).textContent = "Modify";
+    let right = booking.appendChild(document.createElement("button"))
+    right.textContent = "Cancel";
+    right.classList.add("right");
+}
+
+function displayPending(pending) {
+    listings.appendChild(document.createElement("div")).classList.add("booking");
+    let booking = listings.lastChild;
+    booking.classList.add("pending");
+    booking.data = pending;
+    booking.appendChild(document.createElement("div")).textContent = pending.resource;
+    booking.appendChild(document.createElement("div")).textContent = pending.time;
+    booking.appendChild(document.createElement("div")).textContent = pending.date;
+    booking.appendChild(document.createElement("div")).textContent = "Approval pending";
     booking.appendChild(document.createElement("button")).textContent = "Modify";
     let right = booking.appendChild(document.createElement("button"))
     right.textContent = "Cancel";
@@ -73,18 +87,43 @@ function showSidebar(visibility = true) {
 function requestClick(button) {
     switch (button.textContent) {
         case "Submit":
+            if (rResource.value == "" || rTime.value == "" || rDate.value == "") {
+                alert("Please fill in all fields.");
+                return;
+            }
             let res = { "user": user, "resource": rResource.value, "time": rTime.value, "date": rDate.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
 
             // Check if it is in listings (and not auth)
 
             // Add it to the requests
-            let serverRequests = localStorage.getItem("requests");
-            if (serverRequests == null) serverRequests = [];
-            serverRequests.push(res)
-            localStorage.setItem("requests", JSON.stringify(serverRequests));
+            //let serverRequests = JSON.parse(localStorage.getItem("requests"));
+            //serverRequests.push(res)
+            //localStorage.setItem("requests", JSON.stringify(serverRequests));
+            fileRequest(res);
             break;
     }
     clearRequests();
+    displayBookings();
+}
+
+function fileRequest(data) {
+    let listings = JSON.parse(localStorage.getItem("listings"));
+    let index = indexOfBook(listings, data);
+    let serverData = JSON.parse(localStorage.getItem("serverData"));
+
+    if (index != -1) {
+        serverData[user]["bookings"].push(listings.splice(index, 1)[0]);
+        localStorage.setItem("listings", JSON.stringify(listings));
+    } else {
+        data["user"] = user;
+        serverData[user]["pending"].push(data);
+
+        let serverRequests = JSON.parse(localStorage.getItem("requests"));
+        serverRequests.push(data)
+        localStorage.setItem("requests", JSON.stringify(serverRequests));
+        // Maybe add a pending booking?
+    }
+    localStorage.setItem("serverData", JSON.stringify(serverData));
 }
 
 function buttonModifyClick(button) {
@@ -92,17 +131,21 @@ function buttonModifyClick(button) {
         case "Save":
             // Change the listings and availabilities to reflect the data of this booking
             // Requires modifying the user's bookings too
-
+            if (rResource.value == "" || rTime.value == "" || rDate.value == "") {
+                alert("Please fill in all fields.");
+                return;
+            }
             let res = { "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
 
-            let serverData = JSON.parse(localStorage.getItem("serverData"));
-            let index = indexOfBook(serverData[user]["bookings"], toModify.data);
-            console.log(index);
-            serverData[user]["bookings"][index] = res;
-            console.log(serverData);
-            localStorage.setItem("serverData", JSON.stringify(serverData));
+            //let serverData = JSON.parse(localStorage.getItem("serverData"));
+            //let index = indexOfBook(serverData[user]["bookings"], toModify.data);
+            //console.log(index);
+            //serverData[user]["bookings"][index] = res;
+            //console.log(serverData);
+            //localStorage.setItem("serverData", JSON.stringify(serverData));
 
-            toModify.data = res;
+            //toModify.data = res;
+            fileRequest(res);
 
 
 
@@ -158,7 +201,16 @@ function buttonClick(button) {
             break;
         case "Cancel":
             let serverData = JSON.parse(localStorage.getItem("serverData"));
-            remove(serverData[user]["bookings"], data);
+            console.log(button.closest(".booking"))
+            if (!button.closest(".booking").classList.contains("pending")) {
+                remove(serverData[user]["bookings"], data);
+            } else {
+                remove(serverData[user]["pending"], data);
+
+                let requests = JSON.parse(localStorage.getItem("requests"));
+                remove(requests, data);
+                localStorage.setItem("requests", JSON.stringify(requests));
+            }
             localStorage.setItem("serverData", JSON.stringify(serverData));
 
             if (toModify != null) {
