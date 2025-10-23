@@ -7,7 +7,7 @@
     <script src="../js/adminBookings.js"></script>
     <script src="../js/logout.js"></script>
 </head>
-<body onload="displayBookings()">
+<body onload="displayBookings(); displayRequests()">
     <header>
         <div class="buttons">
             <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
@@ -26,9 +26,13 @@
         <li><a href="adminBookings.html">Bookings</a></li>
         <li><a href="adminHistory.html">History</a></li>
     </ul>
-
+    <div class="requestApproval hidden">
+        <button onclick="requestDecision(true)">Approve</button>
+        <button onclick="requestDecision(false)">Decline</button>
+    </div>
 
     <div class="contents">
+
         <div class="listings" onclick="buttonClick(event.target)"></div>
         <div class="sidebar">
             <div class="creation">
@@ -43,7 +47,7 @@
                 <button id="save" class="hidden" onclick="buttonModifyClick(event.target)">Save</button>
                 <button id="back" class="hidden" onclick="buttonModifyClick(event.target)">Back</button>
             </div>
-            <div class="requests"></div>
+            <div class="requests" onclick="displayApproval(event.target)"></div>
         </div>
     </div>
 </body>

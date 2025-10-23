@@ -4,7 +4,11 @@ let time;
 let date;
 let auth;
 let loaded = false;
+let requests;
 let toModify;
+let approval;
+let requestTarget;
+
 function displayBookings() {
     if (!loaded) {
         loaded = true;
@@ -13,6 +17,8 @@ function displayBookings() {
         time = document.querySelector("input[name='time']");
         date = document.querySelector("input[name='date']");
         auth = document.querySelector("input[name='auth']");
+        requests = document.querySelector(".requests");
+        approval = document.querySelector(".requestApproval");
     }
 
     listings.textContent = "";
@@ -26,7 +32,72 @@ function displayBookings() {
     for (let book of data) {
         displayBooking(book);
     }
+}
 
+function displayRequests() {
+    requests.innerHTML = "<p>Approval Pending</p>"
+    let reqData = localStorage.getItem("requests");
+    if (reqData != null) {
+        reqData = JSON.parse(reqData);
+    } else {
+        localStorage.setItem("requests", "[]");
+    }
+
+    for (let req of reqData) {
+        displayRequest(req);
+    }
+}
+
+function displayRequest(req) {
+    let div = requests.appendChild(document.createElement("div"));
+    div.classList.add("request");
+    div.data = req;
+    div.appendChild(document.createElement("span")).textContent = req.resource;
+    div.appendChild(document.createElement("span")).textContent = req.time;
+    div.appendChild(document.createElement("span")).textContent = req.date;
+    div.appendChild(document.createElement("span")).textContent = req.user;
+    //requests.appendChild(document.createElement("button")).textContent = "\u2713";
+    //requests.appendChild(document.createElement("button")).textContent = "\u0078";
+}
+
+function displayApproval(target, visibility = true) {
+    if (!approval.classList.contains("hidden") || target==requests) {
+        approval.classList.add("hidden");
+        return;
+    }
+
+    requestTarget = target.closest(".request");
+
+    if (visibility) {
+        approval.style.top = target.getBoundingClientRect().bottom + "px";
+        approval.style.left = requests.getBoundingClientRect().right + "px";
+        approval.style.transform = "translate(-100%)"
+        approval.classList.remove("hidden");
+    } else {
+        approval.classList.add("hidden");
+    }
+}
+
+function requestDecision(decision) {
+    let reqData = JSON.parse(localStorage.getItem("requests"));
+    remove(reqData, requestTarget.data);
+
+    let serverData = JSON.parse(localStorage.getItem("serverData"));
+    remove(serverData[requestTarget.data.user]["pending"], requestTarget.data);
+   
+    
+    if (decision) {
+        let serverData = JSON.parse(localStorage.getItem("serverData"));
+        // Remove the user from the req.data
+        let temp = requestTarget.data.user;
+        delete requestTarget.data["user"];
+        serverData[temp]["bookings"].push(requestTarget.data);
+    } 
+    requestTarget = null;
+    localStorage.setItem("serverData", JSON.stringify(serverData));
+    localStorage.setItem("requests", JSON.stringify(reqData));
+    displayRequests();
+    displayApproval(null, false);
 }
 
 function displayBooking(book) {
@@ -64,6 +135,19 @@ function createBooking() {
     return false;
 }
 
+function indexOfReq(arr, req) {
+    for (let i in arr) {
+        let r = arr[i];
+        if (r.resource === req.resource &&
+            r.time === req.time &&
+            r.date === req.date &&
+            r.user == req.user) {
+            return arr.indexOf(r);
+        }
+    }
+    return -1;
+}
+
 function indexOfBook(arr, book) {
     for (let i in arr) {
         let b = arr[i];
@@ -77,6 +161,11 @@ function indexOfBook(arr, book) {
     return -1;
 }
 
+
+function removeReq(arr, req) {
+    let x = indexOfReq(arr, req);
+    if (x != -1) arr.splice(x, 1);
+}
 function remove(arr, target) {
     let x = indexOfBook(arr, target);
     if (x != -1) arr.splice(x, 1);
