@@ -75,24 +75,18 @@ ul li a:hover {
     background-color: #111111;
 }
 
-#create, #comLab, #lab, #studyRoom, #gym, #pTrainer, #yoga{
+.contents img { 
+    width:200px; 
+    height:200px;
+    object-fit:cover;
+    margin:8px; 
+    cursor:pointer; 
     border: gray solid;
     margin-left: 50px;
     margin-top: 50px;
     margin-bottom: 50px;
-    height: 200px;
-    width: 150px;
 }
 
-.contents img { 
-    width:120px; 
-    height:80px;
-    object-fit:cover;
-    margin:8px; 
-    cursor:pointer; 
-    border:1px solid #ccc; 
-}
-        
 .modal {
     display:none;
     position:fixed;
