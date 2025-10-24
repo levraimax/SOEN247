@@ -87,3 +87,12 @@ ul {
     flex-direction: column;
     align-content: flex-start;
 }
+
+.contents img { 
+    width:120px; 
+    height:80px;
+    object-fit:cover;
+    margin:8px; 
+    cursor:pointer; 
+    border:1px solid #ccc; 
+}
