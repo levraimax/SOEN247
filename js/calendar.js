@@ -147,7 +147,8 @@ function toggleDayBook(event) {
         let book = event.target.closest(".booking");
         alert(`${day}/${month}/${year}` + " " + book.time + " " + event.target.textContent);
         //alert(event.target.textContent);
-        addBooking(`${day}/${month+1}/${year}`, book.time, event.target.textContent);
+        //addBooking(`${day}/${month + 1}/${year}`, book.time, event.target.textContent);
+        fileRequest({ "resource": event.target.textContent, "time": book.time, "date": `${day}/${month + 1}/${year}` });
     }
 }
 
@@ -157,5 +158,38 @@ function addBooking(date, time, resource) {
     serverData[user]["bookings"].push({ "date": date, "time": time, "resource": resource });
 
     // Set the resource as unavailable and submit for approval if required
+    localStorage.setItem("serverData", JSON.stringify(serverData));
+}
+
+function indexOfBook(arr, book) {
+    for (let i in arr) {
+        let b = arr[i];
+        if (b.resource === book.resource &&
+            b.time === book.time &&
+            b.date === book.date) {
+            return arr.indexOf(b);
+        }
+    }
+    return -1;
+}
+
+function fileRequest(data) {
+    let listings = JSON.parse(localStorage.getItem("listings"));
+    let index = indexOfBook(listings, data);
+    let serverData = JSON.parse(localStorage.getItem("serverData"));
+    let user = localStorage.getItem("user");
+
+    if (index != -1 && !listings[index].auth) {
+        serverData[user]["bookings"].push(listings.splice(index, 1)[0]);
+        localStorage.setItem("listings", JSON.stringify(listings));
+    } else {
+        data["user"] = user;
+        serverData[user]["pending"].push(data);
+
+        let serverRequests = JSON.parse(localStorage.getItem("requests"));
+        serverRequests.push(data)
+        localStorage.setItem("requests", JSON.stringify(serverRequests));
+        // Maybe add a pending booking?
+    }
     localStorage.setItem("serverData", JSON.stringify(serverData));
 }

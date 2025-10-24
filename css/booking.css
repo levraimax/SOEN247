@@ -151,7 +151,7 @@ ul {
         display: none;
     }
 
-    .booking div {
+    .pending div {
         width: calc(100%/4);
         height: 100%;
         border: 1px solid black;
@@ -161,7 +161,7 @@ ul {
         padding-left: 2.5%;
     }
 
-    .booking:hover div {
+    .pending:hover div {
         width: calc(80%/4);
     }
 

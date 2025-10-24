@@ -87,11 +87,13 @@ function requestDecision(decision) {
    
     
     if (decision) {
-        let serverData = JSON.parse(localStorage.getItem("serverData"));
+        //let serverData = JSON.parse(localStorage.getItem("serverData"));
         // Remove the user from the req.data
         let temp = requestTarget.data.user;
         delete requestTarget.data["user"];
         serverData[temp]["bookings"].push(requestTarget.data);
+        console.log(temp)
+        console.log(serverData[temp]);
     } 
     requestTarget = null;
     localStorage.setItem("serverData", JSON.stringify(serverData));

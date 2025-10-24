@@ -111,7 +111,7 @@ function fileRequest(data) {
     let index = indexOfBook(listings, data);
     let serverData = JSON.parse(localStorage.getItem("serverData"));
 
-    if (index != -1) {
+    if (index != -1 && !listings[index].auth) {
         serverData[user]["bookings"].push(listings.splice(index, 1)[0]);
         localStorage.setItem("listings", JSON.stringify(listings));
     } else {
