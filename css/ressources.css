@@ -30,23 +30,15 @@ header {
     margin-right: 5px;
     margin-bottom: 0;
 }
-
-#adminlogin {
-    background-color: aliceblue;
-    color: black;
+#profile{
     height: 30px;
+    border:solid black 1px;
 }
 
-#userlogin {
+#logout {
     background-color: aliceblue;
-    color: black;
     height: 30px;
-}
-
-#signup {
-    background-color: aliceblue;
-    color: black;
-    height: 30px;
+    border: solid black 1px;
 }
 
 ul {
@@ -78,11 +70,13 @@ ul {
     position: relative;
     left: 50%;
     transform: translate(-50%);
-    background-color: yellow;
+    background-color: #d5eebd;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     align-content: flex-start;
+    gap: 10%;
+    padding:10px;
 }
 
 .contents img { 
