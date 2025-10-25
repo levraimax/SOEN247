@@ -6,7 +6,7 @@ function displayBookings() {
         listings = document.querySelector(".listings");
         creation = document.querySelector(".creation");
         user = localStorage.getItem("user");
-        resource = document.querySelector("input[name='resource']");
+        resource = document.querySelector("select[name='resource']");
         time = document.querySelector("input[name='time']");
         date = document.querySelector("input[name='date']");
         rResource = document.querySelector("select[name='requestResource']");
@@ -16,6 +16,7 @@ function displayBookings() {
         let resources = JSON.parse(localStorage.getItem("resources"));
         for (let res of resources) {
             rResource.appendChild(document.createElement("option")).textContent = res.name;
+            resource.appendChild(document.createElement("option")).textContent = res.name;
         }
     }
 
@@ -72,6 +73,18 @@ function indexOfBook(arr, book) {
         }
     }
     return -1;
+}
+
+function indexOfReq(arr,req) {
+    for (let r of arr) {
+        if (r.user==req.user && r.date==req.date && r.time==req.time && r.resource==req.resource) return arr.indexOf(r)
+    }
+    return -1;
+}
+
+function removeReq(arr, req) {
+    let x = indexOfReq(arr, req);
+    if (x != -1) arr.splice(x, 1);
 }
 
 function remove(arr, target) {
@@ -156,12 +169,13 @@ function buttonModifyClick(button) {
             if (toModify.classList.contains("pending")) {
                 // If its pending: Remove it from requests and pending, file a request
                 let serverReq = JSON.parse(localStorage.getItem("requests"));
-                remove(serverReq, res)
-                remove(serverData[user]["pending"], res);
-                localStorage.setItem("requests", serverReq);
+                //remove(serverReq, res)
+                removeReq(serverReq, toModify.data);
+                remove(serverData[user]["pending"], toModify.data);
+                localStorage.setItem("requests", JSON.stringify(serverReq));
             } else {
                 // If its approved: Remove it from bookings, file a request
-                remove(serverData[user]["bookings"], res);
+                remove(serverData[user]["bookings"], toModify.data);
             }
 
 
