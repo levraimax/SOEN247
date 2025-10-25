@@ -36,8 +36,9 @@
         <div class="listings" onclick="buttonClick(event.target)"></div>
         <div class="sidebar">
             <div class="creation">
-                <form onsubmit="createBooking()">
-                    <input type="text" name="resource" placeholder="Resource">
+                <form onsubmit="return createBooking()">
+                    <!--<input type="text" name="resource" placeholder="Resource">-->
+                    <select name="resource"></select>
                     <input type="time" name="time">
                     <input type="date" name="date">
                     <span>Requires authorization: </span>
