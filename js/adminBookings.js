@@ -13,12 +13,17 @@ function displayBookings() {
     if (!loaded) {
         loaded = true;
         listings = document.querySelector(".listings");
-        resource = document.querySelector("input[name='resource']");
+        resource = document.querySelector("select[name='resource']");
         time = document.querySelector("input[name='time']");
         date = document.querySelector("input[name='date']");
         auth = document.querySelector("input[name='auth']");
         requests = document.querySelector(".requests");
         approval = document.querySelector(".requestApproval");
+
+        let resources = JSON.parse(localStorage.getItem("resources"));
+        for (let res of resources) {
+            resource.appendChild(document.createElement("option")).textContent = res.name;
+        }
     }
 
     listings.textContent = "";

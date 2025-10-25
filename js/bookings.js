@@ -9,9 +9,14 @@ function displayBookings() {
         resource = document.querySelector("input[name='resource']");
         time = document.querySelector("input[name='time']");
         date = document.querySelector("input[name='date']");
-        rResource = document.querySelector("input[name='requestResource']");
+        rResource = document.querySelector("select[name='requestResource']");
         rTime = document.querySelector("input[name='requestTime']");
         rDate = document.querySelector("input[name='requestDate']");
+
+        let resources = JSON.parse(localStorage.getItem("resources"));
+        for (let res of resources) {
+            rResource.appendChild(document.createElement("option")).textContent = res.name;
+        }
     }
 
     listings.textContent = "";
@@ -131,11 +136,11 @@ function buttonModifyClick(button) {
         case "Save":
             // Change the listings and availabilities to reflect the data of this booking
             // Requires modifying the user's bookings too
-            if (rResource.value == "" || rTime.value == "" || rDate.value == "") {
+            if (resource.value == "" || time.value == "" || date.value == "") {
                 alert("Please fill in all fields.");
                 return;
             }
-            let res = { "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
+            let res = { "user": user, "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
 
             //let serverData = JSON.parse(localStorage.getItem("serverData"));
             //let index = indexOfBook(serverData[user]["bookings"], toModify.data);
@@ -144,7 +149,24 @@ function buttonModifyClick(button) {
             //console.log(serverData);
             //localStorage.setItem("serverData", JSON.stringify(serverData));
 
-            //toModify.data = res;
+
+
+            let serverData = JSON.parse(localStorage.getItem("serverData"));
+
+            if (toModify.classList.contains("pending")) {
+                // If its pending: Remove it from requests and pending, file a request
+                let serverReq = JSON.parse(localStorage.getItem("requests"));
+                remove(serverReq, res)
+                remove(serverData[user]["pending"], res);
+                localStorage.setItem("requests", serverReq);
+            } else {
+                // If its approved: Remove it from bookings, file a request
+                remove(serverData[user]["bookings"], res);
+            }
+
+
+
+            localStorage.setItem("serverData", JSON.stringify(serverData));
             fileRequest(res);
 
 
