@@ -2,7 +2,8 @@ let availabilities = localStorage.getItem("availabilities");
 if (availabilities == null) localStorage.setItem("availabilities", "{}");
 let requests = localStorage.getItem("requests");
 if (requests == null) localStorage.setItem("requests", "[]");
-
+let history = localStorage.getItem("history");
+if (history == null) localStorage.setItem("history", "[]");
 
 function every(arr, func) {
     for (let i in arr) {
