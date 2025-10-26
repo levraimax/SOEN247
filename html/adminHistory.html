@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Main page</title>
+    <meta charset="utf8" />
+    <link rel="stylesheet" href="../css/adminHistory.css" />
+    <script src="../js/serverFunctions.js"></script>
+    <script src="../js/adminHistory.js"></script>
+    <script src="../js/logout.js"></script>
+</head>
+<body onload="displayHistory()">
+    <header>
+        <div class="buttons">
+            <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
+            <input type="button" onclick="showAlert()" id="logout" value="Log Out">
+        </div>
+        </br>
+        <h1><b>CONCORDIA BOOKING WEBSITE</b></h1>
+        <!-- <p>by Arthur Panoyan, Samuel Charchar, Maxime Charest and George</p> -->
+
+    </header>
+
+    <ul>
+        <li><a href="adminLogged.html">Home</a></li>
+        <li><a href="adminRessources.html">List of Ressources</a></li>
+        <li><a href="adminBookings.html">Bookings</a></li>
+        <li><a href="adminHistory.html">History</a></li>
+    </ul>
+
+
+    <div class="contents"></div>
+</body>
+</html>
