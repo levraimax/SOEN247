@@ -81,9 +81,16 @@ ul {
     position: relative;
     left: 50%;
     transform: translate(-50%);
-    background-color: yellow;
+    background-color: white;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     align-content: flex-start;
+    font-size: 22px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+footer{
+    text-align: center; 
+
 }
