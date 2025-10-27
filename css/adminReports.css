@@ -51,7 +51,7 @@ header {
     height: 30px;
 }
 
-ul {
+.navBar {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -59,21 +59,21 @@ ul {
     background-color: #333333;
 }
 
-    ul li {
-        float: left;
-    }
+.navBar li {
+float: left;
+}
 
-        ul li a {
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
+.navBar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
 
-            ul li a:hover {
-                background-color: #111111;
-            }
+.navBar li a:hover {
+    background-color: #111111;
+}
 
 .contents {
     height: 100%;
@@ -86,11 +86,4 @@ ul {
     flex-wrap: wrap;
     flex-direction: column;
     align-content: flex-start;
-    font-size: 22px;
-    font-family: 'Times New Roman', Times, serif;
-}
-
-footer{
-    text-align: center; 
-
 }

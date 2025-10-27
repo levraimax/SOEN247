@@ -4,7 +4,7 @@
     <title>Main page</title>
     <meta charset="utf8" />
     <link rel="stylesheet" href="../css/loged_in.css" />
-    <script src="../js/loged_in.js"></script>
+    <script src="../js/loged_in.js" defer></script>
     <script src="../js/logout.js"></script>
 </head>
     <body>
@@ -28,6 +28,27 @@
         </ul>
 
         
-        <div class="contents"></div>
+        <div class="contents">
+            <h1>Book a Concordia Ressource</h1>
+            <br><br>
+            <h3>You will be able to:</h3>
+            <ol class="instructions">
+                <li>Navigate through our features with the navigation bar at the top</li>
+                <li>Scroll through our available ressources through the List Ressources tab</li>
+                <li>See the dates with available booking slots in the Calendar tab </li>
+                <li>Fill out the booking request to be able to reserve a room at a time slot in the Booking tab</li>
+                <li>Browse the history of your bookings throughout your semester through the History tab</li>
+            </ol>
+            <br><br>
+            <div class="checkmark">
+                <label for="notifications">Do you wish to receive notifications?</label>
+                <input type="checkbox" id="notifications" name="notification" value="notificationAllow">
+            </div>
+        </div>
+        
+        <footer>
+            <p>Web Developers: Maxime Charest, Arthur Panoyan, Samuel Charchar</p>
+            <p>SOEN287</p>
+        </footer>
     </body>
 </html>
