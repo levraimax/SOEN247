@@ -11,7 +11,6 @@ function displayBookings() {
         requestsElem = document.querySelector(".requests");
         approval = document.querySelector(".requestApproval");
 
-        let resources = JSON.parse(localStorage.getItem("resources"));
         for (let res of resources) {
             resource.appendChild(document.createElement("option")).textContent = res.name;
         }
