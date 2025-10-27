@@ -1,0 +1,89 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    background-color: aliceblue;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: #a8b3ac;
+    margin-left: 0;
+    margin-right: 0;
+    border: 1px solid #a8b3ac;
+    display: block;
+}
+
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 0;
+}
+
+#adminlogin {
+    background-color: aliceblue;
+    color: black;
+    height: 30px;
+}
+
+#userlogin {
+    background-color: aliceblue;
+    color: black;
+    height: 30px;
+}
+
+#signup {
+    background-color: aliceblue;
+    color: black;
+    height: 30px;
+}
+
+.navBar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333333;
+}
+
+.navBar li {
+float: left;
+}
+
+.navBar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navBar li a:hover {
+    background-color: #111111;
+}
+
+.contents {
+    height: 100%;
+    width: 70%;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+    background-color: white;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: flex-start;
+}
