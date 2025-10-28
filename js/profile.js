@@ -5,7 +5,7 @@ function displayData() {
     let serverData = JSON.parse(localStorage.getItem("serverData"));
     let data = serverData[user];
    
-    data = { "Given Name": data["lastName"], "Name": data["firstName"], "email": data["email"], "Phone Number": data["Phone Number"] || undefined, "Address": data["Address"] || undefined };
+    data = { "Last Name": data["lastName"], "First Name": data["firstName"], "Email": data["email"], "Phone Number": data["Phone Number"] || undefined, "Address": data["Address"] || undefined };
 
     let contents = document.querySelector(".contents");
 
@@ -26,9 +26,32 @@ function displayData() {
         if (data[field] != undefined) input.value = data[field];
     }
 
-
+    let saveBtn = document.createElement("button");
+    saveBtn.textContent = "Save";
+    saveBtn.classList.add("saveBtn");
+    saveBtn.onclick = saveAll;
+    contents.appendChild(saveBtn);
 
 }
+
+function saveAll() {
+    let user = localStorage.getItem('user');
+    let serverData = JSON.parse(localStorage.getItem("serverData"));
+    let data = serverData[user];
+
+    let forms = document.querySelectorAll(".sub");
+    forms.forEach(form => {
+        let input = form.querySelector("input");
+        let fieldName = input.name;
+        if (input.valid === undefined || input.valid) {
+            data[fieldName] = input.value;
+        }
+    });
+
+    localStorage.setItem("serverData", JSON.stringify(serverData));
+
+}
+
 
 function capitalize(word) {
     return word.replace(/(^|\s)\w/, letter => letter.toUpperCase());

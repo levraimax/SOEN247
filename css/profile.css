@@ -85,18 +85,44 @@ ul {
     position: relative;
     left: 50%;
     transform: translate(-50%);
-    background-color: yellow;
+    background-color: white;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     align-content: flex-start;
 }
 
-    .contents .sub {
-        padding-left: 1%;
-        padding-right: 1%;
-        height: calc(100%/8);
-        width: fit-content;
-        border: 1px black solid;
-        align-content: center;
-    }
+.contents .sub {
+    padding-left: 1%;
+    padding-right: 1%;
+    height: calc(100%/8);
+    width: fit-content;
+    border: 1px black solid;
+    align-content: center;
+}
+
+.sub:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.saveBtn {
+    margin-top: 10px;
+    align-self: flex-end;
+    padding: 8px 16px;
+    background-color: #0078ff;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.saveBtn:hover {
+    background-color: #005fcc;
+}
+
+.saveBtn:active {
+    transform: scale(0.97);
+}
