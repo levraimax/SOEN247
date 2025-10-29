@@ -1,28 +1,49 @@
 
-
 function displayData() {
     let user = localStorage.getItem('user'); // Fetch from server
     let serverData = JSON.parse(localStorage.getItem("serverData"));
     let data = serverData[user];
-   
-    data = { "Last Name": data["lastName"], "First Name": data["firstName"], "Email": data["email"], "Phone Number": data["Phone Number"] || undefined, "Address": data["Address"] || undefined };
+
+    data = {
+        "Last Name": data["lastName"],
+        "First Name": data["firstName"],
+        "Email": data["email"],
+        "Phone Number": data["Phone Number"] || undefined,
+        "Address": data["Address"] || undefined
+    };
 
     let contents = document.querySelector(".contents");
 
+    let nameRow = null;
+
     for (let field in data) {
-        let sub = contents.appendChild(document.createElement("form"));
+        let parent = contents;
+        if (field === "Last Name") {
+            nameRow = document.createElement("div");
+            nameRow.classList.add("name-row");
+            contents.appendChild(nameRow);
+            parent = nameRow;
+        } else if (field === "First Name" && nameRow) {
+            parent = nameRow;
+        }
+
+        let sub = parent.appendChild(document.createElement("form"));
         sub.classList.add("sub");
         sub.onsubmit = saveData;
-        //Add the p with field
+
         sub.appendChild(document.createElement("p")).textContent = capitalize(field);
+
         let input = sub.appendChild(document.createElement("input"));
         input.type = "text";
         input.name = field;
+
         if (field == "Phone Number") input.oninput = (event) => { input.valid = formatPhone(event.target) };
         if (field == "Email") input.oninput = (event) => { input.valid = validEmail(event.target) };
+
         let submit = sub.appendChild(document.createElement("input"));
         submit.classList.add("hidden");
         submit.type = "submit";
+
         if (data[field] != undefined) input.value = data[field];
     }
 
@@ -31,8 +52,8 @@ function displayData() {
     saveBtn.classList.add("saveBtn");
     saveBtn.onclick = saveAll;
     contents.appendChild(saveBtn);
-
 }
+
 
 function saveAll() {
     let user = localStorage.getItem('user');

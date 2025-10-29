@@ -59,34 +59,34 @@ ul {
     background-color: #333333;
 }
 
-    ul li {
-        float: left;
-    }
+ul li {
+    float: left;
+}
 
-        ul li a {
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
+ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
 
-            ul li a:hover {
-                background-color: #111111;
-            }
+ul li a:hover {
+    background-color: #111111;
+}
 
 .contents {
     height: 100%;
-    width: 70%;
+    width: 85%;
     position: relative;
     left: 50%;
     transform: translate(-50%);
-    background-color: white;
+    background-color: aliceblue;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     align-content: flex-start;
-    font-size: 22px;
+    font-size: 25px;
     font-family: 'Times New Roman', Times, serif;
 }
 
