@@ -17,7 +17,6 @@ function login() {
         localStorage.setItem("user", netname);
         //window.location.href = '../html/userLoged_in.html';
 
-        alert("User admin not implemented yet for testing convenience");
         if (window.location.href.includes("aLogin.html")) {
             window.location.href ='../html/adminLoged_in.html'
         } else {
