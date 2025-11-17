@@ -3,10 +3,11 @@
 <head>
     <title>Profile Page</title>
     <link rel="stylesheet" href="../css/profile.css" />
+    <script src="../js/serverFunctions.js"></script>
     <script src="../js/profile.js"></script>
     <script src="../js/logout.js"></script>
 </head>
-<body onload="displayData()">
+<body onload="displayData()" onsubmit="send(event); return false;">
     <header>
         <div class="buttons">
             <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>

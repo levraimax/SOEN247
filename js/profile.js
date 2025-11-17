@@ -1,33 +1,39 @@
-
+const fieldMap = { "Given Name": "last_name", "Name": "name", "Email": "email", "Phone Number": "phone", "Address": "address" };
 
 function displayData() {
     let user = localStorage.getItem('user'); // Fetch from server
-    let serverData = JSON.parse(localStorage.getItem("serverData"));
-    let data = serverData[user];
-   
-    data = { "Given Name": data["lastName"], "Name": data["firstName"], "email": data["email"], "Phone Number": data["Phone Number"] || undefined, "Address": data["Address"] || undefined };
+    GET(`http://localhost:3000/userdata?netname=${user}`, callback);
+    function callback() {
+        if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+            let data = JSON.parse(this.response)[0];
+            data = { "Given Name": data["last_name"], "Name": data["name"], "Email": data["email"], "Phone Number": data["phone"] || undefined, "Address": data["address"] || undefined };
+            let contents = document.querySelector(".contents");
 
-    let contents = document.querySelector(".contents");
-
-    for (let field in data) {
-        let sub = contents.appendChild(document.createElement("form"));
-        sub.classList.add("sub");
-        sub.onsubmit = saveData;
-        //Add the p with field
-        sub.appendChild(document.createElement("p")).textContent = capitalize(field);
-        let input = sub.appendChild(document.createElement("input"));
-        input.type = "text";
-        input.name = field;
-        if (field == "Phone Number") input.oninput = (event) => { input.valid = formatPhone(event.target) };
-        if (field == "Email") input.oninput = (event) => { input.valid = validEmail(event.target) };
-        let submit = sub.appendChild(document.createElement("input"));
-        submit.classList.add("hidden");
-        submit.type = "submit";
-        if (data[field] != undefined) input.value = data[field];
+            for (let field in data) {
+                let sub = contents.appendChild(document.createElement("form"));
+                sub.classList.add("sub");
+                //sub.onsubmit = saveData;
+                //Add the p with field
+                sub.appendChild(document.createElement("p")).textContent = capitalize(field);
+                let input = sub.appendChild(document.createElement("input"));
+                input.type = "text";
+                input.name = field;
+                if (field == "Phone Number") input.oninput = (event) => { input.valid = formatPhone(event.target) };
+                if (field == "Email") input.oninput = (event) => { input.valid = validEmail(event.target) };
+                let submit = sub.appendChild(document.createElement("input"));
+                submit.classList.add("hidden");
+                submit.type = "submit";
+                if (data[field] != undefined) input.value = data[field];
+            }
+        }
     }
+}
 
-
-
+function send(event) {
+    event.preventDefault()
+    let field = event.target.querySelector("input[type='text']");
+    if (fieldMap[field.name] != "phone" || field.value.length == 13)
+        GET(`http://localhost:3000/submituserdata?field=${fieldMap[field.name]}&value=${field.value}&user=${user}`, null);
 }
 
 function capitalize(word) {
@@ -52,13 +58,13 @@ function validEmail(input) {
     return /^[\w]+@([\w]{1,}\.)[\w]{1,}$/.test(input.value);
 }
 
-function saveData(event) {
-    // Post to server instead
-    if (event.target[0].valid == undefined || event.target[0].valid) {
-        let user = localStorage.getItem('user');
-        let serverData = JSON.parse(localStorage.getItem("serverData"));
-        serverData[user][event.target[0].name] = event.target[0].value;
-        localStorage.setItem('serverData', JSON.stringify(serverData));
-    }
-    return false;
-}
+//function saveData(event) {
+//    // Post to server instead
+//    if (event.target[0].valid == undefined || event.target[0].valid) {
+//        let user = localStorage.getItem('user');
+//        let serverData = JSON.parse(localStorage.getItem("serverData"));
+//        serverData[user][event.target[0].name] = event.target[0].value;
+//        localStorage.setItem('serverData', JSON.stringify(serverData));
+//    }
+//    return false;
+//}
