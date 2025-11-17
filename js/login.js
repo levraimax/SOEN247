@@ -13,13 +13,13 @@ function login() {
                 if (admin) {
                     window.location.href = '../html/adminLoged_in.html'
                 } else {
-                    window.location.href = "../html/userLoged_in.html"
+                    window.location.href ="../html/userLoged_in.html"
                 }
             } else {
                 alert("Incorrect user / password combination");
             }
         }
-    });
+    })
 
     return false;
     //let serverData = localStorage.getItem("serverData");

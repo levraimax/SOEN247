@@ -8,13 +8,14 @@
     <title>Admin Report</title>
     <link rel="stylesheet" href="../css/adminReports.css" />
     <script src="../js/adminReports.js" defer></script>
-    <script src="../js/logout.js" defer></script>
+
+
 
 </head>
 <body>
     <header>
         <div class="buttons">
-            <a href="adminProfile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
+            <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
             <input type="button" onclick="showAlert()" id="logout" value="Log Out">
         </div>
         </br>
@@ -30,18 +31,15 @@
         <li><a href="adminReports.html">Statistics</a></li>
         <li><a href="adminHistory.html">History</a></li>
     </ul>
-    
+    <h1>Resource Usage Reports</h1>
     <div class="contents">
-        
-        <h1>Resource Usage Reports</h1>
-        <div class="ST">
-            <section id="stats">
-            <ul id="popular-resources"></ul>
-            <h2>Peak booking times</h2>
-            <ul id="peak-times"></ul>
+        <section id="stats">
+
+        <ul id="popular-resources"></ul>
+
+        <h2>Peak booking times</h2>
+        <ul id="peak-times"></ul>
         </section>
-        </div>
-        
     </div>
     
 </body>

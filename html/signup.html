@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-    <meta charset="utf-8">
     <title>Login</title>
     <link rel="stylesheet" href="../css/signup.css" />
     <script src="../js/serverFunctions.js"></script>
     <script src="../js/signup.js"></script>
-    <link rel="stylesheet" href="../css/signup.css"/>
-    <script src="../js/signup.js" defer></script>
 </head>
 <body>
     <div class="box">
-        <form onsubmit="return signup(event);">
+        <form onsubmit="return signup()">
             <h1>Create your account </h1>
             <label for="netname">Enter your Netname:</label>
             <br />
@@ -24,7 +21,7 @@
             <br />
             <label for="netname">Enter your email address:</label>
             <br />
-            <input type="text" id="email" name="email" placeholder="Email address" autocomplete="email">
+            <input type="text" id="email" name="email" placeholder="Email address">
             <br />
             <label for="password">Enter your Password:</label>
             <br />
