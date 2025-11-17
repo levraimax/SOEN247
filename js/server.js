@@ -29,7 +29,7 @@ database.connect((err) => {
 
 app.get("/signup", (req, res) => {
     //console.log(req.query);
-    let sql = `INSERT INTO users (netname,name,last_name,email,admin,password) VALUES ('${req.query.netname}','${req.query.firstName}','${req.query.lastName}','${req.query.email}',${(req.query.role=="admin")? 1:0})`
+    let sql = `INSERT INTO users (netname,name,last_name,email,admin,password) VALUES ('${req.query.netname}','${req.query.firstName}','${req.query.lastName}','${req.query.email}',${(req.query.role=="admin")? 1:0},'${req.query.password}')`
     database.query(sql, (err) => {
         if (err) {
             console.log(err);
