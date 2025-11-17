@@ -126,50 +126,50 @@ ul {
     background-color: green;
 }
 
-    .booking div {
-        width: calc(100%/3);
-        height: 100%;
-        border: 1px solid black;
-        padding-top: 1%;
-        padding-bottom: 1%;
-        color: white;
-        padding-left: 2.5%;
-    }
+.booking div {
+    width: calc(100%/3);
+    height: 100%;
+    border: 1px solid black;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    color: white;
+    padding-left: 2.5%;
+}
 
-    .booking:hover div {
-        width: calc(80%/3);
-    }
+.booking:hover div {
+    width: calc(80%/3);
+}
 
-    .booking:hover button, .pending:hover button {
-        display: block;
-        width: 10%;
-    }
+.booking:hover button, .pending:hover button {
+    display: block;
+    width: 10%;
+}
 
 
 
-    .booking:not(hover) button , .pending:not(hover) button{
-        display: none;
-    }
-
-    .pending div {
-        width: calc(100%/4);
-        height: 100%;
-        border: 1px solid black;
-        padding-top: 1%;
-        padding-bottom: 1%;
-        color: white;
-        padding-left: 2.5%;
-    }
-
-    .pending:hover div {
-        width: calc(80%/4);
-    }
-
-.hidden {
+.booking:not(hover) button , .pending:not(hover) button{
     display: none;
 }
 
+.pending div {
+    width: calc(100%/4);
+    height: 100%;
+    border: 1px solid black;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    color: white;
+    padding-left: 2.5%;
+}
+
+.pending:hover div {
+    width: calc(80%/4);
+}
+
+.hidden {
+display: none;
+}
+
 .centered {
-    display: flex;
-    justify-content: center;
+display: flex;
+justify-content: center;
 }

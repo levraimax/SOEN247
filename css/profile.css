@@ -80,23 +80,87 @@ ul {
             }
 
 .contents {
-    height: 100%;
-    width: 70%;
+    height: 95%;
+    width: 80%;
     position: relative;
     left: 50%;
     transform: translate(-50%);
-    background-color: yellow;
+    background-color: beige;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px black;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 24px;
     flex-wrap: wrap;
     flex-direction: column;
-    align-content: flex-start;
+    align-content: center;
 }
 
-    .contents .sub {
-        padding-left: 1%;
-        padding-right: 1%;
-        height: calc(100%/8);
-        width: fit-content;
-        border: 1px black solid;
-        align-content: center;
-    }
+.contents .sub {
+    padding-left: 1%;
+    padding-right: 1%;
+    height: calc(100%/8);
+    width: fit-content;
+    font-size: 25px;
+    margin-bottom: 12px;
+}
+
+.sub > p { 
+    margin:0 0 6px 0;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.sub input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: 15px;      
+    border: 1px solid gray;
+    outline: none;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+    font-size: 1rem;
+}
+.sub input[type="text"]:hover {
+    background-color: aliceblue; 
+}
+.sub input[type="text"]:focus {
+    border-color: lightblue;
+    box-shadow: 0 0 0 3px rgba(127,191,255,0.12);
+}
+.saveBtn {
+    margin-top: 10px;
+    align-self: flex-end;
+    padding: 8px 16px;
+    background-color: #0078ff;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+
+}
+
+.saveBtn:hover {
+    background-color: #005fcc;
+}
+
+.saveBtn:active {
+    transform: scale(0.97);
+}
+
+.name-row{
+    display: flex;
+    gap:12px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.name-row .sub{
+    flex: 1 1 0;
+}
