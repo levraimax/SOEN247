@@ -102,8 +102,9 @@ function lastDay(year, month) {
 function getRoomAvailability(time, date) {
     // Get the rooms based on the time and date
     //let availabilities = JSON.parse(localStorage.getItem("availabilities"));
-    if (availabilities[date] == null || availabilities[date][time] == null) return [];
-    return availabilities[date][time].map(entry => entry.resource);
+    //if (availabilities[date] == null || availabilities[date][time] == null) return [];
+    //return availabilities[date][time].map(entry => entry.resource);
+    return [];
 }
 
 function displayRooms(book) {

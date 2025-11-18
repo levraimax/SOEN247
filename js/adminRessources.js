@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const contentsDiv = document.querySelector('.contents');
 
@@ -22,73 +23,97 @@ document.addEventListener('DOMContentLoaded', () => {
     const createSaveBtn = document.getElementById('createSaveBtn');
     const createCancelBtn = document.getElementById('createCancelBtn');
 
-    let currentResourceId = null;         
-    let droppedImageData = null;        
+    //let currentResourceId = null;
+    let droppedImageData = null;
+    let current = null;
 
-    const STORAGE_KEY = 'resources';
+    //const STORAGE_KEY = 'resources';
 
-    function saveResources(resources){
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(resources));
+    //function saveResources(resources) {
+    //    console.log("SAVE TO LOCAL STORAGE NO LONGER IMPLEMENTED");
+    //    //localStorage.setItem(STORAGE_KEY, JSON.stringify(resources));
+    //}
+
+    function loadResources() {
+        return GET_SYNC("http://localhost:3000/resources")
+        //const items = localStorage.getItem(STORAGE_KEY);
+        //if (!items) return null;
+        //try {
+        //    return JSON.parse(items);
+        //} catch (e) {
+        //    console.warn('Failed to parse resources from local Storage', e);
+        //    return null;
+        //}
     }
 
-    function loadResources(){
-        const items = localStorage.getItem(STORAGE_KEY);
-        if(!items)return null;
-        try{
-            return JSON.parse(items);
-        }catch(e){
-            console.warn('Failed to parse resources from local Storage',e);
-            return null;
-        }
-    }
+    //function initialResourcesFromDom() {
+    //    let resources = loadResources();
+    //    if (resources && Array.isArray(resources))
+    //        return resources;
 
-    function initialResourcesFromDom(){
-        let resources = loadResources();
-        if(resources && Array.isArray(resources))
-            return resources;
+    //    let resources = [];
 
-        resources = [];
+    //    contentsDiv.querySelectorAll('img:not(#create)').forEach((imgEl) => {
+    //        resources.push({
+    //            //id: imgEl.id,
+    //            name: imgEl.dataset.name,
+    //            description: imgEl.dataset.description,
+    //            location: imgEl.dataset.location,
+    //            capacity: imgEl.dataset.capacity,
+    //            img: imgEl.src || '',
+    //            //blocked: imgEl.dataset.blocked == 'true' || false
+    //        });
+    //    });
+    //    //saveResources(resources);
+    //    return resources;
+    //}
 
-        contentsDiv.querySelectorAll('img:not(#create)').forEach((imgEl)=>{
-            resources.push({
-                id: imgEl.id,
-                name: imgEl.dataset.name,
-                description:imgEl.dataset.description,
-                location: imgEl.dataset.location,
-                capacity:imgEl.dataset.capacity,
-                img: imgEl.src || '',
-                blocked:imgEl.dataset.blocked == 'true' || false
-            });
-        });
-        saveResources(resources);
-        return resources;
-    }
-
-    function clearContents(){
-        contentsDiv.innerHTML='';
+    function clearContents() {
+        contentsDiv.innerHTML = '';
         contentsDiv.appendChild(createBtn);
     }
 
-    function renderAllResources(){
-        const resources = loadResources() || initialResourcesFromDom();
+    function renderAllResources() {
+        const resources = loadResources();
+        //const resources = loadResources() || initialResourcesFromDom();
         clearContents();
 
         contentsDiv.appendChild(createBtn);
 
-        resources.forEach(res=>{
-            const img= document.createElement('img');
-            img.src=res.img;
-            img.dataset.id=res.id;
-            img.dataset.name=res.name;
-            img.dataset.description=res.description;
-            img.dataset.location=res.location;
-            img.dataset.capacity=res.capacity;
-            img.dataset.blocked=res.blocked?'true':'false';
-            if(res.id)
-                img.id=res.id;
-            if(res.blocked)
+        //resources.forEach(res => {
+        //    console.log(res)
+        //    const img = document.createElement('img');
+        //    img.src = res.img;
+        //    img.dataset.id = res.id;
+        //    img.dataset.name = res.name;
+        //    img.dataset.description = res.description;
+        //    img.dataset.location = res.location;
+        //    img.dataset.capacity = res.capacity;
+        //    img.dataset.blocked = res.blocked ? 'true' : 'false';
+        //    if (res.id)
+        //        img.id = res.id;
+        //    if (res.blocked)
+        //        img.classList.add('blocked');
+        //    img.addEventListener('click', () => openEditModalFor(img));
+        //    contentsDiv.appendChild(img);
+        //});
+        resources.forEach(res => {
+            console.log(res);
+            const img = document.createElement('img');
+            //img.src = binToImageSrc(res.image);
+            img.src = "http://localhost:3000/resourceImage/" + res.reference;
+            img.dataset.id = res.reference;
+            img.dataset.name = res.name;
+            img.dataset.description = res.description;
+            img.dataset.location = res.location;
+            img.dataset.capacity = res.capacity;
+            //img.dataset.blocked = res.blocked ? 'true' : 'false';
+            img.dataset.blocked = res.blocked;
+            if (res.reference)
+                img.id = res.reference;
+            if (res.blocked)
                 img.classList.add('blocked');
-            img.addEventListener('click',()=>openEditModalFor(img));
+            img.addEventListener('click', () => openEditModalFor(img));
             contentsDiv.appendChild(img);
         });
         attachResourceClickHandlers();
@@ -104,24 +129,28 @@ document.addEventListener('DOMContentLoaded', () => {
     //     saveResources(resources); 
     // }
 
-    function removeResourcebyID(id){
-        let resources = loadResources() || [];
-        resources = resources.filter(r=> r.id !==id);
-        saveResources(resources);
-    }
+    //function removeResourcebyID(id) {
+    //    let resources = loadResources() || [];
+    //    resources = resources.filter(r => r.id !== id);
+    //    saveResources(resources);
+    //}
 
     function openEditModalFor(imgEl) {
-        currentResourceId = imgEl.dataset.id;
+        current = imgEl;
+        //currentResourceId = imgEl.dataset.id;
         editResName.value = imgEl.dataset.name || '';
         editResDesc.value = imgEl.dataset.description || '';
         editResLoc.value = imgEl.dataset.location || '';
         editResCap.value = imgEl.dataset.capacity || '';
-        blockBtn.textContent=imgEl.dataset.blocked === 'true' ? 'Unblock' : 'Block';
+        //blockBtn.textContent = imgEl.dataset.blocked === 'true' ? 'Unblock' : 'Block';
+        blockBtn.textContent = (imgEl.dataset.blocked == 1) ? 'Unblock' : 'Block';
         editModal.style.display = 'block';
+        document.getElementById("editForm").id.value = imgEl.dataset.id;
+        document.getElementById("editForm").blocked.value = imgEl.dataset.blocked;
     }
 
     function attachResourceClickHandlers(root = contentsDiv) {
-        root.querySelectorAll('img:not(#create)').forEach(img=>{
+        root.querySelectorAll('img:not(#create)').forEach(img => {
             img.style.cursor = 'pointer';
         });
         // root.querySelectorAll('img:not(#create)').forEach(img => {
@@ -134,77 +163,106 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     editSaveBtn.addEventListener('click', () => {
-        if (!currentResourceId) return;
-        const resources = loadResources() || [];
-        const idx = resources.findIndex(r=>r.id === currentResourceId);
-        if(idx === -1) return;
-        const oldRes = resources[idx];
-        const updated = {};
-        for(let key in oldRes){
-            if(oldRes.hasOwnProperty(key)){
-                updated[key] = oldRes[key];
-            }
-        }
-        updated.name=editResName.value;
-        updated.description=editResDesc.value;
-        updated.location=editResLoc.value;
-        updated.capacity=editResCap.value;
+        //if (!currentResourceId) return;
+        if (current == null) return;
 
-        resources[idx] = updated;
-        saveResources(resources);
-        renderAllResources();
+        //sendQuery(document.getElementById("editForm"), "http://localhost:3000/updateResource", function () {
+        //    if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+        //        renderAllResources();
+        //    }
+        //});
+        submitEdit(renderAllResources);
+
         editModal.style.display = 'none';
-        alert('Resource updated!');
+
+
+
+        //resources[idx] = updated;
+        //saveResources(resources);
+        //renderAllResources();
+        //editModal.style.display = 'none';
+        //alert('Resource updated!');
     });
 
     editCancelBtn.addEventListener('click', () => {
         editModal.style.display = 'none';
     });
 
-    removeBtn.addEventListener('click',()=>{
-        if(!currentResourceId)
-            return;
-        const resources = loadResources();
-        const idx = resources.findIndex(r=>r.id===currentResourceId);
-        if(idx===-1)
-            return;
-        const name = resources[idx].name;
-        const confirmed = confirm('Are you sure you want to delete ' + name + '?');
-        if(!confirmed)
-            return;
-        removeResourcebyID(currentResourceId);
-        currentResourceId=null;
+    removeBtn.addEventListener('click', (event) => {
+        //GET_SYNC(`http://localhost:3000/deleteResource?reference=${currentResourceId}`);
+        GET_SYNC(`http://localhost:3000/deleteResource?reference=${current.dataset.id}`);
         renderAllResources();
-        editModal.style.display='none';
-        alert('Resource deleted!');
+        //if (!currentResourceId)
+        //    return;
+        //const resources = loadResources();
+        //const idx = resources.findIndex(r => r.id === currentResourceId);
+        //if (idx === -1)
+        //    return;
+        //const name = resources[idx].name;
+        //const confirmed = confirm('Are you sure you want to delete ' + name + '?');
+        //if (!confirmed)
+        //    return;
+        //removeResourcebyID(currentResourceId);
+        //currentResourceId = null;
+        current = null;
+        //renderAllResources();
+        editModal.style.display = 'none';
+        //alert('Resource deleted!');
     });
 
-    blockBtn.addEventListener('click',()=>{
-        if(!currentResourceId) return;
-        const resources = loadResources() || [];
-        const idx = resources.findIndex(r=>r.id === currentResourceId);
-        if(idx === -1)
-            return;
-        const currentlyBlocked = resources[idx].blocked === true;
-        const name = resources[idx].name;
+    blockBtn.addEventListener('click', () => {
+        //if (!currentResourceId) return;
+        if (current == null) return;
+        //const resources = loadResources() || [];
+        //const idx = resources.findIndex(r => r.id === currentResourceId);
+        //if (idx === -1)
+        //    return;
+        //const currentlyBlocked = resources[idx].blocked === true;
+        //const name = resources[idx].name;
 
-        if(!currentlyBlocked){
-            const confirmed = confirm('Do you want to block ' + name + '?');
-            if(!confirmed) return;
-            resources[idx].blocked = true;
-            saveResources(resources);
-            renderAllResources();
-            alert(name + ' is now blocked!');
+        //if (!currentlyBlocked) {
+        //    const confirmed = confirm('Do you want to block ' + name + '?');
+        //    if (!confirmed) return;
+        //    resources[idx].blocked = true;
+        //    saveResources(resources);
+        //    renderAllResources();
+        //    alert(name + ' is now blocked!');
+        //}
+        //else {
+        //    const confirmed = confirm('Do you want to unblock ' + name + '?');
+        //    if (!confirmed) return;
+        //    resources[idx].blocked = false;
+        //    saveResources(resources);
+        //    renderAllResources();
+        //    alert(name + ' is now unblocked!');
+        //}
+        let editForm = document.getElementById("editForm");
+        let name = current.dataset.name;
+
+        if (current.dataset.blocked == 0) {
+            //const confirmed = confirm('Do you want to block ' + name + '?');
+            //if (!confirmed) return;
+            //resources[idx].blocked = true;
+            editForm.blocked.value = 1;
+            current.classList.add("blocked");
+            //saveResources(resources);
+            //renderAllResources();
+            //alert(name + ' is now blocked!');
         }
-        else{
-            const confirmed = confirm('Do you want to unblock ' + name +'?');
-            if(!confirmed) return;
-            resources[idx].blocked=false;
-            saveResources(resources);
-            renderAllResources();
-            alert(name + ' is now unblocked!');
+        else {
+            //const confirmed = confirm('Do you want to unblock ' + name + '?');
+            //if (!confirmed) return;
+            editForm.blocked.value = 0;
+            if (current.classList.contains("blocked")) current.classList.remove("blocked");
+
+            //resources[idx].blocked = false;
+            //saveResources(resources);
+            //renderAllResources();
+            //alert(name + ' is now unblocked!');
         }
-        editModal.style.display='none';
+        current = null;
+        submitEdit(renderAllResources);
+        editModal.style.display = 'none';
     });
 
     createBtn.addEventListener('click', () => {
@@ -222,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         createModal.style.display = 'none';
     });
 
-    ['dragenter','dragover','dragleave','drop'].forEach(eventName => {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         createDropArea.addEventListener(eventName, (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -246,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const reader = new FileReader();
         reader.onload = (ev) => {
-            droppedImageData = ev.target.result; 
+            droppedImageData = ev.target.result;
             createDropArea.style.backgroundImage = `url(${droppedImageData})`;
             createDropArea.style.backgroundSize = 'cover';
             createDropArea.textContent = '';
@@ -273,23 +331,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     createSaveBtn.addEventListener('click', () => {
-        const resources = loadResources();
-        const newId = 'res_' + Date.now() + Math.random();
-        const newRes={
-            id:newId,
-            name:createResName.value,
-            description:createResDesc.value,
-            location:createResLoc.value,
-            capcaity: createResCap,
-            img:droppedImageData || '../img/default.png',
-            blocked:false
-        };
-        resources.push(newRes);
-        saveResources(resources);
-        createModal.style.display='none';
-        droppedImageData=null;
-        createFileInput.value='';
-        renderAllResources();
+        processCreation(document.getElementById("creationForm")).then(() => {
+            createModal.style.display = 'none';
+            droppedImageData = null;
+            createFileInput.value = '';
+            renderAllResources();
+        })
     });
 
 
@@ -300,6 +347,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    initialResourcesFromDom();
     renderAllResources();
 });
+
+function submitEdit(renderAllResources) {
+    sendQuery(document.getElementById("editForm"), "http://localhost:3000/updateResource", function () {
+        if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+            renderAllResources();
+        }
+    });
+}
+
+function processCreation(form) {
+    return sendResource(form)
+}

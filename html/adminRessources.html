@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>Main page</title>
     <link rel="stylesheet" href="../css/adminRessources.css" />
+    <script src="../js/serverFunctions.js" defer></script>
     <script src="../js/adminRessources.js" defer></script>
     <script src="../js/logout.js"></script>
 </head>
@@ -13,7 +14,7 @@
             <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
             <input type="button" onclick="showAlert()" id="logout" value="Log Out">
         </div>
-        <br/>
+        <br />
         <h1><b>CONCORDIA BOOKING WEBSITE</b></h1>
         <h2 style="color: red"><b>ADMIN MODE</b></h2>
     </header>
@@ -28,71 +29,42 @@
 
     <div class="contents">
         <img src="../img/adding.png" id="create" alt="Create resource">
-
-        <img src="../img/studyRoom.jpg" id="studyRoom"
-             data-name="Study Room"
-             data-description="A quiet room for studying, equipped with tables, chairs, whiteboards, and enough space for group projects. Ideal for focused work or team study sessions."
-             data-location="H building and LB building"
-             data-capacity="5">
-
-        <img src="../img/computer lab.jpg" id="comLab"
-             data-name="Computer Lab"
-             data-description="Rooms with computer labs available by ENCS students"
-             data-location="H building"
-             data-capacity="20">
-
-        <img src="../img/lab.png" id="lab"
-             data-name="Laboratory"
-             data-description="Laboratory equipped with chemicals and lab equipment available for PhYS and CHEM students"
-             data-location="H building"
-             data-capacity="10">
-        <br/>
-        <img src="../img/gym.jpg" id="gym"
-             data-name="Gym"
-             data-description="Le Gym available for students of Concordia"
-             data-location="SGW building"
-             data-capacity="40">
-
-        <img src="../img/pTrainer.png" id="pTrainer"
-             data-name="Personal Trainer"
-             data-description="Personal Trainers professionaly trained to help you reach your fitness goals"
-             data-location="SGW building"
-             data-capacity="1">
-
-        <img src="../img/yoga.png" id="yoga"
-             data-name="Yoga Classes"
-             data-description="Yoga classes available to all Concordia students"
-             data-location="SGW building"
-             data-capacity="10">
     </div>
 
-    <div id="editModal" class="modal" aria-hidden="true">
-        <h3>Edit Resource</h3>
-        <label>Name: <input type="text" id="editResName"></label><br><br>
-        <label>Description:</label><br>
-        <textarea id="editResDesc" rows="5" cols="50"></textarea><br><br>
-        <label>Location: <input type="text" id="editResLoc"></label><br><br>
-        <label>Capacity: <input type="number" id="editResCap"></label><br><br>
-        <button id="editSaveBtn">Save</button>
-        <button id="editCancelBtn">Cancel</button>
-        <button id="removeBtn" style="background-color: red; color:white;">Delete</button> 
-        <button id="blockBtn">Block</button>
-    </div>
+    <form id="editForm" onsubmit="return false;">
+        <div id="editModal" class="modal" aria-hidden="true">
+            <h3>Edit Resource</h3>
+            <input type="text" name="id" style="display:None" />
+            <input type="text" name="blocked" style="display:None" />
+            <label>Name: <input type="text" name="name" id="editResName"></label><br><br>
+            <label>Description:</label><br>
+            <textarea name="description" id="editResDesc" rows="5" cols="50"></textarea><br><br>
+            <label>Location: <input type="text" name="location" id="editResLoc"></label><br><br>
+            <label>Capacity: <input type="number" name="capacity" id="editResCap"></label><br><br>
+            <button id="editSaveBtn">Save</button>
+            <button id="editCancelBtn">Cancel</button>
+            <button id="removeBtn" style="background-color: red; color:white;">Delete</button>
+            <button id="blockBtn">Block</button>
+        </div>
+    </form>
 
-    <div id="createModal" class="modal" aria-hidden="true">
-        <h3>Create Resource</h3>
-        <label>Name: <input type="text" id="createResName"></label><br><br>
-        <label>Description:</label><br>
-        <textarea id="createResDesc" rows="5" cols="50"></textarea><br><br>
-        <label>Location: <input type="text" id="createResLoc"></label><br><br>
-        <label>Capacity: <input type="number" id="createResCap"></label><br><br>
+    <form id="creationForm" onsubmit="return false;">
+        <div id="createModal" class="modal" aria-hidden="true">
+            <h3>Create Resource</h3>
+            <label>Name: <input type="text" id="createResName" name="name"></label><br><br>
+            <label>Description:</label><br>
+            <textarea name="description" id="createResDesc" rows="5" cols="50"></textarea><br><br>
+            <!--<input type="text" id="createResDesc" rows="5" cols="50" name="description" />--><br><br>
+            <label>Location: <input type="text" id="createResLoc" name="location"></label><br><br>
+            <label>Capacity: <input type="number" id="createResCap" name="capacity"></label><br><br>
 
-        <div id="createDropArea">Drop image here<br>or click to choose</div>
-        <input type="file" id="createFileInput" accept="image/*" style="display:none;" />
-        <br>
-        <button id="createSaveBtn">Save</button>
-        <button id="createCancelBtn">Cancel</button>
-    </div>
+            <div id="createDropArea">Drop image here<br>or click to choose</div>
+            <input type="file" id="createFileInput" accept="image/*" style="display:none;" name="image" />
+            <br>
+            <button id="createSaveBtn">Save</button>
+            <button id="createCancelBtn">Cancel</button>
+        </div>
+    </form>
 
 </body>
 </html>

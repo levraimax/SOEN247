@@ -64,6 +64,32 @@ function GET(url, callback) {
     xmlHttp.send();
 }
 
+function GET_SYNC(url) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", url, false);
+    xmlHttp.send()
+
+    if (xmlHttp.response) {
+        return JSON.parse(xmlHttp.response);
+    }
+    return null;
+}
+
+function sendResource(form) {
+    let fd = new FormData(form);
+    fd.set("image", form.image.files[0]);
+
+    return fetch("http://localhost:3000/createResource", {
+        method: "POST",
+        body: fd
+    })
+}
+
+function binToImageSrc(bin) {
+    return "data:image/png;base64," + bin;
+}
+
+
 function remove(arr, book) {
     let x = indexOfBook(arr, book);
     if (x != -1) arr.splice(x, 1);
@@ -121,7 +147,6 @@ function fileRequest(data) {
         // Maybe add a pending booking?
     }
     save("serverData");
-
 }
 
 function appendHistory(text, admin = false, userOnly = null) {
