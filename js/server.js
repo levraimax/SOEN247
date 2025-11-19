@@ -141,31 +141,70 @@ app.get("/resourceImage/:id", (req, res) => {
     });
 });
 
+function formatDateTime(dateTime) {
+    return dateTime.replace("T", " ") + ":00";
+}
 
 app.get("/createAvailability", (req, res) => {
-    let resource = req.query.resource;
-    let start = req.query.start;
-    let end = req.query.end;
-    let capacity = req.query.capacity | 1;
+    //let resource = req.query.resource;
+    //let start = req.query.start;
+    //let end = req.query.end;
+    //let auth = req.query.auth | 0;
+    let { resource, start, end, auth } = req.query;
+    //let capacity = req.query.capacity | 1;
 
-    if (resource == null || start == null || end == null) {
+    if (resource == null || start == null || end == null || auth==null) {
         res.status(500).send("Invalid inputs");
     } else {
-        start = start.replace("T", " ") + ":00";
-        end = end.replace("T", " ") + ":00";
-        let sql = `INSERT INTO availabilities (resource,start,end,capacity) VALUES (${resource},'${start}','${end}',${capacity})`
+        start = formatDateTime(start)
+        end = formatDateTime(end)
+        let sql = `INSERT INTO availabilities (resource,start,end,auth) VALUES (${resource},'${start}','${end}','${auth}')`
         //console.log("HERE\t", sql);
         database.query(sql, (err) => {
             if (err) {
                 console.log(err);
-                res.status(500).send("Failure");
+                res.status(500).send();
             } else {
-                res.status(200).send("Success");
+                res.status(200).send();
             }
         })
     }
 
 
+})
+
+app.get("/deleteAvailability", (req, res) => {
+    let availability = req.query.reference;
+    if (availability != null) {
+        let sql = `DELETE FROM availabilities WHERE reference = ${availability}`
+        database.query(sql, (err) => {
+            if (err) {
+                console.log(err)
+                res.status(500).send()
+            } else {
+                res.status(200).send();
+            }
+        })
+    }
+})
+
+app.get("/updateAvailability", (req, res) => {
+    let { reference, resource, start, end, auth } = req.query;
+
+    if (reference == null || resource == null | start == null || end == null || auth == null) {
+        console.log("Invalid inputs")
+        res.status(500).send("Invalid inputs")
+    } else {
+        let sql = `UPDATE availabilities SET resource = ?, start = ?, end = ?, auth = ? WHERE reference = ${reference}`;
+        let params = [resource, formatDateTime(start), formatDateTime(end), auth];
+        database.query(sql, params, (err) => {
+            if (err) {
+                res.status(500).send();
+            } else {
+                res.status(200).send();
+            }
+        })
+    }
 })
 
 app.get("/updateResource", (req, res) => {
@@ -222,11 +261,23 @@ app.get("/resources", (req, res) => {
 })
 
 app.get("/availabilities", (req, res) => {
-
     let sql = "SELECT * FROM availabilities";
     database.query(sql, (err, result) => {
         if (err) {
             res.status(500).send("Error");
+        } else {
+            res.status(200).json(result);
+        }
+    })
+})
+
+app.get("/requests", (req, res) => {
+    console.log("Obtaining requests.. implement checking credentials")
+    let sql = "SELECT * FROM requests";
+    database.query(sql, (err,result) => {
+        if (err) {
+            console.log(err)
+            res.status(500).send("Error")
         } else {
             res.status(200).json(result);
         }

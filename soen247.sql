@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 18, 2025 at 02:08 AM
+-- Generation Time: Nov 19, 2025 at 02:03 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,7 +32,6 @@ CREATE TABLE `availabilities` (
   `start` datetime NOT NULL,
   `end` datetime NOT NULL,
   `resource` int(11) NOT NULL,
-  `capacity` int(11) NOT NULL DEFAULT 1,
   `auth` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -43,6 +42,18 @@ CREATE TABLE `availabilities` (
 --
 
 CREATE TABLE `bookings` (
+  `reference` int(11) NOT NULL,
+  `availability` int(11) NOT NULL,
+  `user` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `requests`
+--
+
+CREATE TABLE `requests` (
   `reference` int(11) NOT NULL,
   `availability` int(11) NOT NULL,
   `user` int(11) NOT NULL
@@ -86,6 +97,7 @@ INSERT INTO `resources` (`reference`, `name`, `description`, `location`, `capaci
 --
 
 CREATE TABLE `users` (
+  `reference` int(11) NOT NULL,
   `netname` text NOT NULL,
   `password` text NOT NULL,
   `name` text NOT NULL,
@@ -100,8 +112,8 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`netname`, `password`, `name`, `last_name`, `email`, `phone`, `address`, `admin`) VALUES
-('username', 'pass', 'Maxime', 'Charest', 'email@email.com', '123-456-1234', '123 street street', 1);
+INSERT INTO `users` (`reference`, `netname`, `password`, `name`, `last_name`, `email`, `phone`, `address`, `admin`) VALUES
+(1, 'username', 'pass', 'Maxime', 'Charest', 'email@email.com', '123-456-1234', '123 street street', 1);
 
 --
 -- Indexes for dumped tables
@@ -123,6 +135,14 @@ ALTER TABLE `bookings`
   ADD KEY `bookings_ibfk_1` (`availability`);
 
 --
+-- Indexes for table `requests`
+--
+ALTER TABLE `requests`
+  ADD PRIMARY KEY (`reference`),
+  ADD KEY `availability` (`availability`),
+  ADD KEY `user` (`user`);
+
+--
 -- Indexes for table `resources`
 --
 ALTER TABLE `resources`
@@ -132,6 +152,7 @@ ALTER TABLE `resources`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
+  ADD PRIMARY KEY (`reference`),
   ADD UNIQUE KEY `username` (`netname`) USING HASH;
 
 --
@@ -142,7 +163,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `availabilities`
 --
 ALTER TABLE `availabilities`
-  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `bookings`
@@ -151,10 +172,22 @@ ALTER TABLE `bookings`
   MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
+-- AUTO_INCREMENT for table `requests`
+--
+ALTER TABLE `requests`
+  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `resources`
 --
 ALTER TABLE `resources`
   MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
@@ -171,6 +204,13 @@ ALTER TABLE `availabilities`
 --
 ALTER TABLE `bookings`
   ADD CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`availability`) REFERENCES `availabilities` (`reference`);
+
+--
+-- Constraints for table `requests`
+--
+ALTER TABLE `requests`
+  ADD CONSTRAINT `requests_ibfk_1` FOREIGN KEY (`availability`) REFERENCES `availabilities` (`reference`),
+  ADD CONSTRAINT `requests_ibfk_2` FOREIGN KEY (`user`) REFERENCES `users` (`reference`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

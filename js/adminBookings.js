@@ -1,19 +1,50 @@
-let listingsElem, resource, time, date, auth, loaded = false, requestsElem, toModify, approval, requestTarget;
+let listingsElem, resource, start, end, auth, loaded = false, requestsElem, toModify, approval, requestTarget;
+let listings;
+let resources;
+
+function loadData() {
+    loadListings();
+    loadResources();
+    loadRequests();
+
+    listingsElem = document.querySelector(".listings");
+    resource = document.querySelector("select[name='resource']");
+    start = document.querySelector("input[name='start']");
+    end = document.querySelector("input[name='end']");
+    auth = document.querySelector("input[name='auth']");
+    requestsElem = document.querySelector(".requests");
+    approval = document.querySelector(".requestApproval");
+}
+
+
+function loadListings() {
+    listings = GET_SYNC("http://localhost:3000/availabilities")
+}
+
+function loadResources() {
+    resources = GET_SYNC("http://localhost:3000/resources")
+}
+
+function loadRequests() {
+    requests = GET_SYNC("http://localhost:3000/requests")
+
+}
+
+function accessData(list, ref) {
+    for (data of list) {
+        if (data["reference"] == ref) return data;
+    }
+    return null;
+}
 
 function displayBookings() {
     if (!loaded) {
         loaded = true;
-        listingsElem = document.querySelector(".listings");
-        resource = document.querySelector("select[name='resource']");
-        time = document.querySelector("input[name='time']");
-        date = document.querySelector("input[name='date']");
-        auth = document.querySelector("input[name='auth']");
-        requestsElem = document.querySelector(".requests");
-        approval = document.querySelector(".requestApproval");
-
         for (let res of resources) {
-            resource.appendChild(document.createElement("option")).textContent = res.name;
+            resource.appendChild(document.createElement("option")).textContent = res.name + ` (${res.reference})`;
+            resource.lastChild.reference = res.reference;
         }
+        resource.value = "";
     }
 
     listingsElem.textContent = "";
@@ -96,10 +127,16 @@ function displayBooking(book) {
     //listings.textContent = "";
     listingsElem.appendChild(document.createElement("div")).classList.add("booking");
     let booking = listingsElem.lastChild;
+    let resource = accessData(resources, book.resource);
+    book.resource_name = resource.name + ` (${resource.reference})`;
     booking.data = book;
-    booking.appendChild(document.createElement("div")).textContent = book.resource;
-    booking.appendChild(document.createElement("div")).textContent = book.time;
-    booking.appendChild(document.createElement("div")).textContent = book.date;
+    //booking.appendChild(document.createElement("div")).textContent = book.resource;
+
+    booking.appendChild(document.createElement("div")).textContent = book.resource_name;
+    //booking.appendChild(document.createElement("div")).textContent = book.time;
+    booking.appendChild(document.createElement("div")).textContent = (new Date(book.start)).toLocaleString();
+    //booking.appendChild(document.createElement("div")).textContent = book.date;
+    booking.appendChild(document.createElement("div")).textContent = (new Date(book.end)).toLocaleString();
     booking.appendChild(document.createElement("button")).textContent = "Modify";
     let right = booking.appendChild(document.createElement("button"))
     right.textContent = "Cancel";
@@ -107,24 +144,34 @@ function displayBooking(book) {
 }
 
 
-function createBooking() {
-    let dateValue = date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1");
-    let authValue = auth.checked;
+function createBooking(event) {
+    event.preventDefault();
+    let form = document.getElementById("creationForm")
+    let temp = { "resource": form.resource.selectedOptions[0].reference, "start": start.value, "end": end.value, "auth": (auth.checked) ? 1 : 0 };
+    console.log(temp)
+    let fd = new URLSearchParams(temp);
+    console.log(fd.toString())
+    //return;
+    GET_SYNC("http://localhost:3000/createAvailability?" + fd.toString())
+    loadListings();
+    //return;
+    //let dateValue = end.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1");
+    //let authValue = auth.checked;
 
-    //let serverListings = JSON.parse(localStorage.getItem("listings"));
-    let data = { "resource": resource.value, "time": time.value, "date": dateValue, auth: authValue };
-    listings.push(data)
-    //localStorage.setItem("listings", JSON.stringify(serverListings));
-    save("listings");
+    ////let serverListings = JSON.parse(localStorage.getItem("listings"));
+    //let data = { "resource": resource.value, "time": start.value, "date": dateValue, auth: authValue };
+    //listings.push(data)
+    ////localStorage.setItem("listings", JSON.stringify(serverListings));
+    //save("listings");
 
-    //let availabilities = JSON.parse(localStorage.getItem("availabilities"));
-    if (availabilities[dateValue] == undefined) availabilities[dateValue] = {};
-    if (availabilities[dateValue][time.value] == undefined) availabilities[dateValue][time.value] = [];
-    availabilities[dateValue][time.value].push(data);
-    //localStorage.setItem("availabilities", JSON.stringify(availabilities));
-    save("availabilities");
+    ////let availabilities = JSON.parse(localStorage.getItem("availabilities"));
+    //if (availabilities[dateValue] == undefined) availabilities[dateValue] = {};
+    //if (availabilities[dateValue][start.value] == undefined) availabilities[dateValue][start.value] = [];
+    //availabilities[dateValue][start.value].push(data);
+    ////localStorage.setItem("availabilities", JSON.stringify(availabilities));
+    //save("availabilities");
 
-    appendHistory(`${user} made ${data.resource} available at ${data.time} on ${data.date}`, true);
+    //appendHistory(`${user} made ${data.resource} available at ${data.time} on ${data.date}`, true);
 
     clear();
     displayBookings();
@@ -173,29 +220,33 @@ function buttonModifyClick(button) {
             // Change the listings and availabilities to reflect the data of this booking
             // Requires modifying the user's bookings too
 
-            let res = { "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1"), "auth": auth.checked }
+            //let res = { "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1"), "auth": auth.checked }
+            let res = { "reference": toModify.data.reference, "resource": toModify.data.resource, "start": start.value, "end": end.value, "auth": (auth.checked) ? 1 : 0 }
+            let fd = new URLSearchParams(res);
+            GET_SYNC("http://localhost:3000/updateAvailability?" + fd.toString())
+            loadListings();
+            //return;
+            //// Listing
+            ////let listings = JSON.parse(localStorage.getItem("listings"));
+            //listings[indexOfBook(listings, toModify.data)] = res;
+            //// Availabilities
+            ////let availabilities = JSON.parse(localStorage.getItem("availabilities"));
 
-            // Listing
-            //let listings = JSON.parse(localStorage.getItem("listings"));
-            listings[indexOfBook(listings, toModify.data)] = res;
-            // Availabilities
-            //let availabilities = JSON.parse(localStorage.getItem("availabilities"));
-
-            if (toModify.data.date == res.date && toModify.data.time == res.time) {
-                availabilities[res.date][res.time][indexOfBook(availabilities[res.date][res.time], toModify.data)] = res;
-            } else {
-                remove(availabilities[toModify.data.date][toModify.data.time], toModify.data);
-                if (availabilities[res.date] == undefined) availabilities[res.date] = {};
-                if (availabilities[res.date][res.time] == undefined) availabilities[res.date][res.time] = [];
-                availabilities[res.date][res.time].push(res);
-            }
-            appendHistory(`${user} modified booking: ${toModify.data.resource} at ${toModify.data.time} on ${toModify.data.date} to ${res.resource} at ${res.time} on ${res.date}`, true);
+            //if (toModify.data.date == res.date && toModify.data.time == res.time) {
+            //    availabilities[res.date][res.time][indexOfBook(availabilities[res.date][res.time], toModify.data)] = res;
+            //} else {
+            //    remove(availabilities[toModify.data.date][toModify.data.time], toModify.data);
+            //    if (availabilities[res.date] == undefined) availabilities[res.date] = {};
+            //    if (availabilities[res.date][res.time] == undefined) availabilities[res.date][res.time] = [];
+            //    availabilities[res.date][res.time].push(res);
+            //}
+            //appendHistory(`${user} modified booking: ${toModify.data.resource} at ${toModify.data.time} on ${toModify.data.date} to ${res.resource} at ${res.time} on ${res.date}`, true);
             toModify.data = res;
 
             //localStorage.setItem("listings", JSON.stringify(listings));
             //localStorage.setItem("availabilities", JSON.stringify(availabilities));
-            save("listings");
-            save("availabilities");
+            //save("listings");
+            //save("availabilities");
 
             document.getElementById("submit").classList.remove("hidden");
             document.querySelectorAll(".creation button").forEach(btn => btn.classList.add("hidden"));
@@ -218,9 +269,16 @@ function buttonModifyClick(button) {
 
 function clear() {
     resource.value = "";
-    time.value = "";
-    date.value = "";
+    start.value = "";
+    end.value = "";
     auth.checked = false;
+}
+
+
+function formattedDate(date) {
+    var d = new Date(date);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 16);
 }
 
 
@@ -231,9 +289,13 @@ function buttonClick(button) {
     switch (button.textContent) {
         case "Modify":
             //alert(button.textContent + ", " + data.resource + " " + data.time + " " + data.date);
-            resource.value = data.resource;
-            time.value = data.time;
-            date.value = data.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1");
+            resource.value = data.resource_name;
+            //time.value = data.time;
+
+
+            start.value = formattedDate(data.start)
+            end.value = formattedDate(data.end);
+            //date.value = data.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1");
             auth.checked = data.auth;
 
 
@@ -249,13 +311,16 @@ function buttonClick(button) {
 
             break;
         case "Cancel":
-            //let serverListings = JSON.parse(localStorage.getItem("listings"));
-            appendHistory(`${user} removed listing: ${data.resource} at ${data.time} on ${data.date}`, true);
-            cancel(data);
-            //remove(listings, data)
-            //remove(availabilities[data.date][data.time], data);
-            //save("listings");
-            //save("availabilities");
+            ////let serverListings = JSON.parse(localStorage.getItem("listings"));
+            //appendHistory(`${user} removed listing: ${data.resource} at ${data.time} on ${data.date}`, true);
+            //cancel(data);
+            ////remove(listings, data)
+            ////remove(availabilities[data.date][data.time], data);
+            ////save("listings");
+            ////save("availabilities");
+
+            GET_SYNC(`http://localhost:3000/deleteAvailability?reference=${data.reference}`)
+            loadListings();
 
             if (toModify != null) {
                 document.getElementById("submit").classList.remove("hidden");

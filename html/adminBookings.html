@@ -8,7 +8,7 @@
     <script src="../js/adminBookings.js"></script>
     <script src="../js/logout.js"></script>
 </head>
-<body onload="displayBookings(); displayRequests()">
+<body onload="loadData();  displayBookings(); displayRequests()">
     <header>
         <div class="buttons">
             <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
@@ -39,11 +39,12 @@
         <div class="listings" onclick="buttonClick(event.target)"></div>
         <div class="sidebar">
             <div class="creation">
-                <form onsubmit="return createBooking()">
+                <form id="creationForm" onsubmit="return createBooking(event)">
                     <!--<input type="text" name="resource" placeholder="Resource">-->
                     <select name="resource"></select>
-                    <input type="time" name="time">
-                    <input type="date" name="date">
+                    <input type="datetime-local" name="start">
+                    <input type="datetime-local" name="end">
+                    <!--<input type="date" name="date">-->
                     <span>Requires authorization: </span>
                     <input type="checkbox" name="auth" placeholder="auth">
                     <input type="submit" id="submit">
