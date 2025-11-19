@@ -3,12 +3,11 @@
 <head>
     <title>Main page</title>
     <meta charset="utf8" />
-    <link rel="stylesheet" href="../css/adminHistory.css" />
+    <link rel="stylesheet" href="../css/adminCalendar.css" />
     <script src="../js/serverFunctions.js"></script>
-    <script src="../js/adminHistory.js"></script>
     <script src="../js/logout.js"></script>
 </head>
-<body onload="displayHistory()">
+<body onload="displayDays()">
     <header>
         <div class="buttons">
             <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
@@ -17,6 +16,7 @@
         </br>
         <h1><b>CONCORDIA BOOKING WEBSITE</b></h1>
         <h2 style="color: red"><b>ADMIN MODE</b></h2>
+        <!-- <p>by Arthur Panoyan, Samuel Charchar, Maxime Charest and George</p> -->
 
     </header>
 
@@ -28,8 +28,22 @@
         <li><a href="adminReports.html">Statistics</a></li>
         <li><a href="adminHistory.html">History</a></li>
     </ul>
+    <div class="requestApproval hidden">
+        <button onclick="requestDecision(true)">Approve</button>
+        <button onclick="requestDecision(false)">Decline</button>
+    </div>
 
-
-    <div class="contents"></div>
+    <div class="contents">
+        <div class="calendar" onclick="toggleDayBook(event)">
+            <div class="tab">
+                <span></span>
+                <button type="button" onclick="navigateDate(1)">></button>
+                <button type="button" style="transform:translate(-100%)" onclick="navigateDate(-1)"><</button>
+                <button id="backButton" type="button" class="hidden" style="left:0; right:auto">&#8630;</button>
+            </div>
+            <div id="hours" class="hidden"></div>
+        </div>
+    </div>
+    <script src="../js/adminCalendar.js"></script>
 </body>
 </html>
