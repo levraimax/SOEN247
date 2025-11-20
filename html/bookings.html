@@ -8,13 +8,13 @@
     <script src="../js/bookings.js"></script>
     <script src="../js/logout.js"></script>
 </head>
-<body onload="displayBookings()">
+<body onload="load(); displayBookings()">
     <header>
         <div class="buttons">
             <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
             <input type="button" onclick="showAlert()" id="logout" value="Log Out">
         </div>
-        </br>
+        <br/>
         <h1><b>CONCORDIA BOOKING WEBSITE</b></h1>
         <!-- <p>by Arthur Panoyan, Samuel Charchar, Maxime Charest and George</p> -->
 
@@ -34,8 +34,8 @@
                 <p class="centered"> File Requests</p>
                 <!--<input type="text" name="requestResource" placeholder="Resource">-->
                 <select name="requestResource"></select>
-                <input type="time" name="requestTime">
-                <input type="date" name="requestDate">
+                <input type="datetime-local" name="start">
+                <input type="datetime-local" name="end">
                 <br>
                 <button onclick="requestClick(event.target)">Submit</button>
                 <button onclick="requestClick(event.target)">Clear</button>
@@ -45,8 +45,8 @@
         <div class="sidebar">
             <div class="creation hidden">
                 <select name="resource"></select>
-                <input type="time" name="time">
-                <input type="date" name="date">
+                <input type="datetime-local" name="start">
+                <input type="datetime-local" name="end">
                 <br>
                 <button id="save" onclick="buttonModifyClick(event.target)">Save</button>
                 <button id="back" onclick="buttonModifyClick(event.target)">Back</button>

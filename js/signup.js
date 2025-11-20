@@ -12,8 +12,8 @@ function every(arr, func) {
     return true;
 }
 
-function signup() {
-    //e.preventDefault();
+function signup(e) {
+    e.preventDefault();
     const form = document.querySelectorAll("div input[type='text']");
     const passwords = document.querySelectorAll("div input[type='password']");
     const roles = document.querySelectorAll("div input[type='radio']:checked");

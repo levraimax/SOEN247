@@ -1,35 +1,101 @@
 let creation, resource, time, date, toModify, rResource, rDate, rTime;
-let loaded = false;
-function displayBookings() {
-    if (!loaded) {
-        loaded = true;
-        listingsElem = document.querySelector(".listings");
-        creation = document.querySelector(".creation");
-        //user = localStorage.getItem("user");
-        resource = document.querySelector("select[name='resource']");
-        time = document.querySelector("input[name='time']");
-        date = document.querySelector("input[name='date']");
-        rResource = document.querySelector("select[name='requestResource']");
-        rTime = document.querySelector("input[name='requestTime']");
-        rDate = document.querySelector("input[name='requestDate']");
-
-        //let resources = JSON.parse(localStorage.getItem("resources"));
-        for (let res of resources) {
-            rResource.appendChild(document.createElement("option")).textContent = res.name;
-            resource.appendChild(document.createElement("option")).textContent = res.name;
-        }
+//let loaded = false;
+let resources, requests, availabilities, bookings;
+function loadResources() {
+    resources = GET_SYNC("http://localhost:3000/resources")
+    for (let res of resources) {
+        res.displayName = `${res.name} (${res.reference})`
     }
+}
+
+function loadAvailabilities() {
+    availabilities = GET_SYNC("http://localhost:3000/availabilities")
+}
+
+function getAvailability(ref) {
+    for (let av of availabilities) if (av.reference == ref) return av;
+}
+
+function getBookings() {
+    bookings = GET_SYNC("http:localhost:3000/")
+}
+
+function getResource(dp) {
+    return find(resources, (x) => { return x.reference == dp.resource })
+}
+
+function loadData() {
+    let data = USER_DATA(2);
+    bookings = data.bookings;
+    requests = data.requests;
+}
+
+
+function load() {
+    loadResources();
+    loadData()
+
+
+
+    //loaded = true;
+    listingsElem = document.querySelector(".listings");
+    creation = document.querySelector(".creation");
+    //user = localStorage.getItem("user");
+    resource = document.querySelector("select[name='resource']");
+    time = document.querySelector(".creation input[name='start']");
+    date = document.querySelector(".creation input[name='end']");
+    rResource = document.querySelector("select[name='requestResource']");
+    rTime = document.querySelector("input[name='start']");
+    rDate = document.querySelector("input[name='end']");
+
+    //let resources = JSON.parse(localStorage.getItem("resources"));
+    for (let res of resources) {
+        rResource.appendChild(document.createElement("option")).textContent = res.displayName;
+        resource.appendChild(document.createElement("option")).textContent = res.displayName;
+
+        rResource.lastChild.data = res;
+        resource.lastChild.data = res;
+
+        rResource.value = "";
+        resource.value = "";
+    }
+}
+
+
+function displayBookings() {
+    //if (!loaded) {
+    //    loaded = true;
+    //    listingsElem = document.querySelector(".listings");
+    //    creation = document.querySelector(".creation");
+    //    //user = localStorage.getItem("user");
+    //    resource = document.querySelector("select[name='resource']");
+    //    time = document.querySelector("input[name='time']");
+    //    date = document.querySelector("input[name='date']");
+    //    rResource = document.querySelector("select[name='requestResource']");
+    //    rTime = document.querySelector("input[name='start']");
+    //    rDate = document.querySelector("input[name='end']");
+
+    //    //let resources = JSON.parse(localStorage.getItem("resources"));
+    //    for (let res of resources) {
+    //        rResource.appendChild(document.createElement("option")).textContent = res.name;
+    //        resource.appendChild(document.createElement("option")).textContent = res.name;
+    //    }
+    //}
 
     listingsElem.textContent = "";
     //let data = JSON.parse(localStorage.getItem("serverData"));
 
-    for (let book of serverData[user]["bookings"]) {
-        displayBooking(book);
-    }
+    //for (let book of serverData[user]["bookings"]) {
+    //    displayBooking(book);
+    //}
 
-    for (let pending of serverData[user]["pending"]) {
-        displayPending(pending);
-    }
+    for (let book of bookings) displayBooking(book.availability)
+
+    //for (let pending of serverData[user]["pending"]) {
+    //    displayPending(pending);
+    //}
+
+    for (let pending of requests) displayPending(pending)
 
 }
 
@@ -38,9 +104,12 @@ function displayBooking(book) {
     listingsElem.appendChild(document.createElement("div")).classList.add("booking");
     let booking = listingsElem.lastChild;
     booking.data = book;
-    booking.appendChild(document.createElement("div")).textContent = book.resource;
-    booking.appendChild(document.createElement("div")).textContent = book.time;
-    booking.appendChild(document.createElement("div")).textContent = book.date;
+    //booking.appendChild(document.createElement("div")).textContent = book.resource;
+    //booking.appendChild(document.createElement("div")).textContent = book.time;     // Start
+    //booking.appendChild(document.createElement("div")).textContent = book.date;     // End
+    booking.appendChild(document.createElement("div")).textContent = getResource(book).displayName
+    booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(book.start);     // Start
+    booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(book.end);     // End
     booking.appendChild(document.createElement("button")).textContent = "Modify";
     let right = booking.appendChild(document.createElement("button"))
     right.textContent = "Cancel";
@@ -51,10 +120,20 @@ function displayPending(pending) {
     listingsElem.appendChild(document.createElement("div")).classList.add("booking");
     let booking = listingsElem.lastChild;
     booking.classList.add("pending");
-    booking.data = pending;
-    booking.appendChild(document.createElement("div")).textContent = pending.resource;
-    booking.appendChild(document.createElement("div")).textContent = pending.time;
-    booking.appendChild(document.createElement("div")).textContent = pending.date;
+    let temp = pending
+
+    if (pending.availability != null) {
+        temp = pending.availability;
+    }
+    console.log(pending)
+    booking.reference = pending.reference
+    booking.data = temp;
+    //booking.appendChild(document.createElement("div")).textContent = temp.resource;
+    //booking.appendChild(document.createElement("div")).textContent = temp.time;
+    //booking.appendChild(document.createElement("div")).textContent = temp.date;
+    booking.appendChild(document.createElement("div")).textContent = getResource(temp).displayName;
+    booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(temp.start);
+    booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(temp.end);
     booking.appendChild(document.createElement("div")).textContent = "Approval pending";
     booking.appendChild(document.createElement("button")).textContent = "Modify";
     let right = booking.appendChild(document.createElement("button"))
@@ -109,15 +188,17 @@ function requestClick(button) {
                 alert("Please fill in all fields.");
                 return;
             }
-            let res = { "user": user, "resource": rResource.value, "time": rTime.value, "date": rDate.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
-
+            //let res = { "user": user, "resource": rResource.value, "time": rTime.value, "date": rDate.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
+            let selected = rResource.selectedOptions[0]
+            let res = { "user": user_reference, "resource": selected.data.reference, "start": rTime.value, "end": rDate.value }
+            //console.log(res)
             // Check if it is in listings (and not auth)
 
             // Add it to the requests
             //let serverRequests = JSON.parse(localStorage.getItem("requests"));
             //serverRequests.push(res)
             //localStorage.setItem("requests", JSON.stringify(serverRequests));
-            fileRequest(res);
+            fileRequest(res, loadData);
             break;
     }
     clearRequests();
@@ -153,7 +234,13 @@ function buttonModifyClick(button) {
                 alert("Please fill in all fields.");
                 return;
             }
-            let res = { "user": user, "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
+
+
+            //let res = { "user": user, "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
+            let selected = resource.selectedOptions[0];
+            let res = { "user": user_reference, "resource": selected.data.reference, "start": time.value, "end": date.value, "reference": toModify.reference }
+            updateRequest(res, loadData)
+
 
             //let serverData = JSON.parse(localStorage.getItem("serverData"));
             //let index = indexOfBook(serverData[user]["bookings"], toModify.data);
@@ -166,25 +253,25 @@ function buttonModifyClick(button) {
 
             //let serverData = JSON.parse(localStorage.getItem("serverData"));
 
-            if (toModify.classList.contains("pending")) {
-                // If its pending: Remove it from requests and pending, file a request
-                //let serverReq = JSON.parse(localStorage.getItem("requests"));
-                //remove(serverReq, res)
-                //removeReq(serverReq, toModify.data);
-                removeReq(requests, toModify.data);
-                remove(serverData[user]["pending"], toModify.data);
-                //localStorage.setItem("requests", JSON.stringify(serverReq));
-                save("requests")
-            } else {
-                // If its approved: Remove it from bookings, file a request
-                remove(serverData[user]["bookings"], toModify.data);
-            }
+            //if (toModify.classList.contains("pending")) {
+            //    // If its pending: Remove it from requests and pending, file a request
+            //    //let serverReq = JSON.parse(localStorage.getItem("requests"));
+            //    //remove(serverReq, res)
+            //    //removeReq(serverReq, toModify.data);
+            //    removeReq(requests, toModify.data);
+            //    remove(serverData[user]["pending"], toModify.data);
+            //    //localStorage.setItem("requests", JSON.stringify(serverReq));
+            //    save("requests")
+            //} else {
+            //    // If its approved: Remove it from bookings, file a request
+            //    remove(serverData[user]["bookings"], toModify.data);
+            //}
 
 
 
             //localStorage.setItem("serverData", JSON.stringify(serverData));
-            save("serverData");
-            fileRequest(res);
+            //save("serverData");
+            //fileRequest(res);
 
 
 
@@ -218,15 +305,17 @@ function clearRequests() {
 
 function buttonClick(button) {
     toModify = button.closest(".booking");
+    if (toModify == null) return;
     let data = toModify.data;
 
     switch (button.textContent) {
         case "Modify":
             //alert(button.textContent + ", " + data.resource + " " + data.time + " " + data.date);
             showSidebar();
-            resource.value = data.resource;
-            time.value = data.time;
-            date.value = data.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1");
+            resource.value = getResource(data).displayName;
+            time.value = formattedDate(data.start)
+            date.value = formattedDate(data.end);
+            //date.value = data.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1");
 
 
             //Modifying allows to modify the contents
@@ -239,20 +328,29 @@ function buttonClick(button) {
 
             break;
         case "Cancel":
-            //let serverData = JSON.parse(localStorage.getItem("serverData"));
-            //console.log(button.closest(".booking"))
-            if (!button.closest(".booking").classList.contains("pending")) {
-                remove(serverData[user]["bookings"], data);
-            } else {
-                remove(serverData[user]["pending"], data);
 
-                //let requests = JSON.parse(localStorage.getItem("requests"));
-                remove(requests, data);
-                //localStorage.setItem("requests", JSON.stringify(requests));
-                save("requests")
+
+
+
+            ////let serverData = JSON.parse(localStorage.getItem("serverData"));
+            ////console.log(button.closest(".booking"))
+            if (!button.closest(".booking").classList.contains("pending")) {
+                //remove(serverData[user]["bookings"], data);
+                GET_SYNC(`http://localhost:3000/deleteBooking?reference=${toModify.reference}`)
+                loadData();
+            } else {
+                //remove(serverData[user]["pending"], data);
+                GET_SYNC(`http://localhost:3000/deleteRequest?reference=${toModify.reference}`)
+                loadData();
             }
-            //localStorage.setItem("serverData", JSON.stringify(serverData));
-            save("serverData");
+
+            //    //let requests = JSON.parse(localStorage.getItem("requests"));
+            //    remove(requests, data);
+            //    //localStorage.setItem("requests", JSON.stringify(requests));
+            //    save("requests")
+            //}
+            ////localStorage.setItem("serverData", JSON.stringify(serverData));
+            //save("serverData");
 
             if (toModify != null) {
                 clear();

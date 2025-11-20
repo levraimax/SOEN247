@@ -4,6 +4,7 @@
 //}
 
 let user = localStorage.getItem("user");
+let user_reference = localStorage.getItem("reference");
 //if (user == null) {
 //    alert("You must login for proper functionality.");
 //    window.location.href = "../html/signup.html";
@@ -57,6 +58,8 @@ function sendQuery(form, url, callback) {
     GET(url + "?" + params.toString(), callback)
     return false;
 }
+
+
 function GET(url, callback) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = callback;
@@ -75,6 +78,26 @@ function GET_SYNC(url) {
     return null;
 }
 
+function USER_DATA(user) {
+    let bookings = GET_SYNC(`http://localhost:3000/booksData?user=${user}`);
+    let requests = GET_SYNC(`http://localhost:3000/requestsData?user=${user}`)
+    let availabilities = GET_SYNC("http://localhost:3000/availabilities")
+
+    for (let book of bookings) {
+        book.availability = find(availabilities, (x) => { return x.reference == book.availability });
+    }
+
+    for (let req of requests) {
+        req.availability = find(availabilities, (x) => { return x.reference == req.availability });
+    }
+
+    return { "bookings": bookings, "requests": requests };
+}
+
+function find(arr, dele) {
+    for (let x of arr) if (dele(x)) return x
+}
+
 function sendResource(form) {
     let fd = new FormData(form);
     fd.set("image", form.image.files[0]);
@@ -83,6 +106,17 @@ function sendResource(form) {
         method: "POST",
         body: fd
     })
+}
+
+function formatDateFromServer(date) {
+    let d = new Date(date);
+    return d.toLocaleString();
+}
+
+function formattedDate(date) {
+    var d = new Date(date);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 16);
 }
 
 function binToImageSrc(bin) {
@@ -129,24 +163,32 @@ function indexOfReq(arr, req) {
     return -1;
 }
 
-function fileRequest(data) {
-    let index = indexOfBook(listings, data);
+function fileRequest(data,callback=None) {
+    let fd = new URLSearchParams(data);
+    GET_SYNC("http://localhost:3000/request?"+fd.toString())
+    //let index = indexOfBook(listings, data);
+    if (callback) callback();
+    //if (index != -1 && !listings[index].auth) {
+    //    serverData[user]["bookings"].push(listings[index]);
+    //    cancel(listings[index]);
+    //    appendHistory(`${user} booked ${data.resource} at ${data.time} on ${data.date}`);
 
-    if (index != -1 && !listings[index].auth) {
-        serverData[user]["bookings"].push(listings[index]);
-        cancel(listings[index]);
-        appendHistory(`${user} booked ${data.resource} at ${data.time} on ${data.date}`);
+    //} else {
+    //    data["user"] = user;
+    //    serverData[user]["pending"].push(data);
 
-    } else {
-        data["user"] = user;
-        serverData[user]["pending"].push(data);
+    //    requests.push(data)
+    //    save("requests");
+    //    appendHistory(`${user} requested ${data.resource} at ${data.time} on ${data.date}`);
+    //    // Maybe add a pending booking?
+    //}
+    //save("serverData");
+}
 
-        requests.push(data)
-        save("requests");
-        appendHistory(`${user} requested ${data.resource} at ${data.time} on ${data.date}`);
-        // Maybe add a pending booking?
-    }
-    save("serverData");
+function updateRequest(data, callback = None) {
+    let fd = new URLSearchParams(data);
+    GET_SYNC("http://localhost:3000/updateRequest?" + fd.toString())
+    if (callback) callback();
 }
 
 function appendHistory(text, admin = false, userOnly = null) {

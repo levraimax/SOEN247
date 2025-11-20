@@ -33,8 +33,10 @@ database.connect((err) => {
 
 app.get("/signup", (req, res) => {
     //console.log(req.query);
-    let sql = `INSERT INTO users (netname,name,last_name,email,admin,password) VALUES ('${req.query.netname}','${req.query.firstName}','${req.query.lastName}','${req.query.email}',${(req.query.role == "admin") ? 1 : 0})`
-    database.query(sql, (err) => {
+    let { netname, firstName, lastName, email, role, password } = req.query;
+    let params = [netname, firstName, lastName, email, (role == "admin") ? 1 : 0, password]
+    let sql = `INSERT INTO users (netname,name,last_name,email,admin,password) VALUES (?,?,?,?,?,?)`
+    database.query(sql, params, (err) => {
         if (err) {
             console.log(err);
             res.status(500).send();
@@ -51,11 +53,11 @@ app.get("/login", (req, res) => {
     if (netname == null || password == null) {
 
     } else {
-        let sql = `SELECT password, admin FROM users WHERE netname = '${netname}'`
+        let sql = `SELECT password, admin, reference FROM users WHERE netname = '${netname}'`
         database.query(sql, (err, result) => {
             if (!err && result.length > 0) {
                 console.log("admin", result[0].admin);
-                res.status(200).json([result[0].password == password, result[0].admin]);
+                res.status(200).json([result[0].password == password, result[0].admin,result[0].reference]);
             } else {
                 res.status(200).send(false);
             }
@@ -77,6 +79,40 @@ app.get("/login", (req, res) => {
 //        }
 //    })
 //})
+
+
+app.get("/booksData", (req, res) => {
+    let { user } = req.query;
+
+    let sql = `SELECT * FROM bookings WHERE user = ?`
+
+    database.query(sql, [user], (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send()
+        } else {
+            res.status(200).json(result);
+        }
+    })
+})
+
+
+
+app.get("/requestsData", (req, res) => {
+    let { user } = req.query;
+
+    let sql = `SELECT * FROM requests WHERE user = ?`
+
+    database.query(sql, [user], (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send()
+        } else {
+            res.status(200).json(result);
+        }
+    })
+
+})
 
 app.get("/userdata", (req, res) => {
 
@@ -151,9 +187,14 @@ app.get("/createAvailability", (req, res) => {
     //let end = req.query.end;
     //let auth = req.query.auth | 0;
     let { resource, start, end, auth } = req.query;
+
+    console.log(resource)
+    console.log(start)
+    console.log(end)
+    console.log(auth)
     //let capacity = req.query.capacity | 1;
 
-    if (resource == null || start == null || end == null || auth==null) {
+    if (resource == null || start == null || end == null || auth == null) {
         res.status(500).send("Invalid inputs");
     } else {
         start = formatDateTime(start)
@@ -249,6 +290,33 @@ app.get("/deleteResource", (req, res) => {
     })
 })
 
+app.get("/deleteRequest", (req, res) => {
+    console.log("Deleting request.. implement checking credentials")
+    let { reference } = req.query;
+    let sql = `DELETE FROM requests WHERE reference = ${reference}`
+    database.query(sql, (err) => {
+        if (err) {
+            res.status(404).send();
+        } else {
+            res.status(200).send();
+        }
+    })
+})
+
+app.get("/deleteBooking", (req, res) => {
+    console.log("Deleting booking.. implement checking credentials")
+    console.log("Deleting booking.. IMPLEMENT CAPACITY")
+    let { reference } = req.query;
+    let sql = `DELETE FROM bookings WHERE reference = ${reference}`
+    database.query(sql, (err) => {
+        if (err) {
+            res.status(404).send();
+        } else {
+            res.status(200).send();
+        }
+    })
+})
+
 app.get("/resources", (req, res) => {
     let sql = "SELECT reference,name,description,location,capacity,blocked FROM resources";
     database.query(sql, (err, result) => {
@@ -274,7 +342,7 @@ app.get("/availabilities", (req, res) => {
 app.get("/requests", (req, res) => {
     console.log("Obtaining requests.. implement checking credentials")
     let sql = "SELECT * FROM requests";
-    database.query(sql, (err,result) => {
+    database.query(sql, (err, result) => {
         if (err) {
             console.log(err)
             res.status(500).send("Error")
@@ -284,13 +352,30 @@ app.get("/requests", (req, res) => {
     })
 })
 
+
 app.get("/request", (req, res) => {
-    let availability = req.query.availability;
-    let user = req.query.user;
+    let { user, availability } = req.query
+    if (availability == null) {
+        let { start, end, resource } = req.query;
+        start=formatDateTime(start)
+        end=formatDateTime(end)
 
+        if (start == null || end == null || resource == null) {
+            res.status(500).send()
+        } else {
+            let sql = `INSERT INTO requests (user,start,end,resource) VALUES (?,?,?,?)`
+            let params = [user, start, end, resource];
+            database.query(sql, params, (err) => {
+                if (err) {
+                    console.log(err)
+                    res.status(500).send()
+                } else {
+                    res.status(200).send()
+                }
+            })
+        }
 
-
-    if (availability == null || user == null) {
+    } else if (user == null) {
         res.status(500).send("Invalid resource or user");
     } else {
         if (hasRoom(availability)) {
@@ -307,7 +392,26 @@ app.get("/request", (req, res) => {
             res.status(500).send("No room left");
         }
     }
+})
 
+app.get("/updateRequest", (req, res) => {
+    console.log("Updating request.. implement checking credentials");
+    let {reference, start, end, resource } = req.query;
+
+    if (reference == null || start == null || end == null || resource == null) {
+        res.status(500).send()
+    } else {
+        let sql = `UPDATE requests SET reference = ?, start = ?, end = ?, resource = ? WHERE reference = ?`
+        let params = [reference, formatDateTime(start), formatDateTime(end), resource, reference]
+        database.query(sql, params, (err) => {
+            if (err) {
+                console.log(err)
+                res.status(500).send()
+            } else {
+                res.status(200).send();
+            }
+        })
+    }
 })
 
 //app.get("/getstudent/:id", (req, res) => {
