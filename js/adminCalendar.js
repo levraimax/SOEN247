@@ -21,7 +21,7 @@ const today = new Date();
 let month = today.getMonth();
 let year = today.getFullYear();
 let day = today.getDate();
-let date = `${day}/${month + 1}/${year}`;
+let date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
 // For drag selection
 let isSelecting = false;
@@ -206,7 +206,7 @@ function lastDay(year, month) {
 function toggleDayBook(event) {
     if (event.target.classList.contains("day")) {
         day = event.target.day;
-        date = `${day}/${month + 1}/${year}`;
+        date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         document.querySelectorAll(".tab button").forEach(button => button.classList.add("hidden"));
         days.forEach(day => day.classList.add("hidden"));
         document.querySelector(".tab span").textContent = event.target.textContent;
