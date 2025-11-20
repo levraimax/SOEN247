@@ -5,9 +5,10 @@
     <meta charset="utf8" />
     <link rel="stylesheet" href="../css/adminCalendar.css" />
     <script src="../js/serverFunctions.js"></script>
+    <script src="../js/server.js"></script>
     <script src="../js/logout.js"></script>
 </head>
-<body onload="displayDays()">
+<body onload="displayDays(); loadData()">
     <header>
         <div class="buttons">
             <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
@@ -42,6 +43,18 @@
                 <button id="backButton" type="button" class="hidden" style="left:0; right:auto">&#8630;</button>
             </div>
             <div id="hours" class="hidden"></div>
+        </div>
+    </div>
+    <div id="resourceModal" class="modal">
+        <div id="modalContent">
+            <h3>Select a resource for this time slot:</h3>
+            <select name="resourceSelect" class="resourceSelect" id="resourceSelect">
+                <option value="">-- Select a Resource --</option>
+            </select>
+            <div class = "buttonsModal">
+                <button id="createOkBtn" class="createOkBtn">Ok</button>
+                <button id="createcancelBtn" class="createcancelBtn">Cancel</button>
+            </div>
         </div>
     </div>
     <script src="../js/adminCalendar.js"></script>

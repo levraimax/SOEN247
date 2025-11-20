@@ -3,6 +3,18 @@ const monthStrings = ["January", "February", "March", "April", "May", "June", "J
 const calendar = document.querySelector('.calendar');
 const tab = calendar.querySelector('.tab');
 
+let resources;
+
+function loadData(){
+    loadResources();
+
+    resource = document.querySelector("select[name='resource']");
+}
+
+function loadResources(){
+    resources = GET_SYNC("http://localhost:3000/resources");
+}
+
 let days = [];
 let timeSlots = [];
 const today = new Date();
@@ -91,35 +103,70 @@ function createBooking() {
         return;
     }
     
-    const sortedSlots = selectedSlots.sort((a, b) => {
-        const timeA = a.dataset.time;
-        const timeB = b.dataset.time;
-        return timeA.localeCompare(timeB);
-    });
+    const sortedSlots = selectedSlots.sort((a, b) => a.dataset.time.localeCompare(b.dataset.time));
     
     const startTime = sortedSlots[0].dataset.time;
     const endTime = sortedSlots[sortedSlots.length - 1].dataset.endTime;
     
-    const resourceInput = prompt("Ressource to create this booking: ")
+    const modal = document.getElementById("resourceModal");
+    const select = document.getElementById("resourceSelect");
+    const okBtn = document.getElementById("createOkBtn");
+    const cancelBtn = document.getElementById("createcancelBtn");
 
-    // if(!resourceInput || !resourceIOnput.trim()){
-    //     alert("Booking slots not filled: no resource selected.")
-    //     return;
-    // }
+    select.innerHTML='<option value="">-- Select a Resource --></option>';
+    resources.forEach(resource=>{
+        const option = document.createElement('option');
+        option.value = resource.reference;
+        option.textContent=resource.name;
+        select.appendChild(option);
+    });
 
-    const bookingInfo = {
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
-        slots: selectedSlots.length,
-        resource: resourceInput.trim()
-    };
+    modal.style.display="flex";
+
+
+
+    cancelBtn.onclick = function() {
+        modal.style.display = "none";
+    }
     
-    alert(`Booking created:\nDate: ${date}\nTime: ${startTime} - ${endTime}\nDuration: ${selectedSlots.length * 20} minutes\nResource: ${resourceInput.trim()}`);
-
-    selectedSlots = [];
-    timeSlots.forEach(slot => slot.classList.remove('selected'));
-    document.getElementById("confirmBooking").classList.add("hidden");
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+    
+    okBtn.onclick = function() {
+        const resourceInput = select.value;
+        
+        if(!resourceInput || !resourceInput.trim()) {
+            alert("Please select a resource.");
+            return;
+        }
+        
+        const start = `${date}T${startTime}`;
+        const end = `${date}T${endTime}`;
+        const aut = 1;
+        
+        GET(
+            `http://localhost:3000/createAvailability?resource=${resourceInput}` +
+            `&start=${start}&end=${end}&auth=${aut}`,
+            function() {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                        alert("Availability created!");
+                        modal.style.display = "none";
+                        
+                        // Clear selected slots
+                        selectedSlots = [];
+                        timeSlots.forEach(slot => slot.classList.remove('selected'));
+                        document.getElementById("confirmBooking").classList.add("hidden");
+                    } else {
+                        alert("Error creating availability. Please try again.");
+                    }
+                }
+            }
+        );
+    }
 }
 
 function navigateDate(direction) {
@@ -212,3 +259,4 @@ function toggleSlotSelection(slot) {
         }
     }
 }
+
