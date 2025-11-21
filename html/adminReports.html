@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <title>Admin Report</title>
     <link rel="stylesheet" href="../css/adminReports.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="../js/adminReports.js" defer></script>
 
 
@@ -32,15 +33,25 @@
         <li><a href="adminReports.html">Statistics</a></li>
         <li><a href="adminHistory.html">History</a></li>
     </ul>
-    <h1>Resource Usage Reports</h1>
     <div class="contents">
         <section id="stats">
+        <h2>Usage charts</h2>
+        <div class="charts-row">
+            <div class="chart-container">
+                <canvas id="resourcePieChart"></canvas>
+                <p id="top-resource">Top booked resource: <span id="top-resource-name">(loading...)</span></p>
+                <p id="bottom-resource">Least booked resource: <span id="bottom-resource-name">(loading...)</span></p>
+            </div>
 
-        <ul id="popular-resources"></ul>
+            <div class="chart-container chart-with-list">
+                <canvas id="timePieChart"></canvas>
+                <h3>Peak booking times</h3>
+                <ul id="peak-times"></ul>
+            </div>
+        </div>
 
-        <h2>Peak booking times</h2>
-        <ul id="peak-times"></ul>
-        </section>
+        </section> 
+       
     </div>
     
 </body>

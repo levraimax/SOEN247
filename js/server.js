@@ -353,6 +353,50 @@ app.get("/requests", (req, res) => {
 })
 
 
+// Reports endpoint: return booking counts per resource
+app.get("/reports/resourceCounts", (req, res) => {
+    const sql = `
+        SELECT r.reference, r.name, COUNT(b.reference) AS bookings
+        FROM resources r
+        LEFT JOIN availabilities a ON a.resource = r.reference
+        LEFT JOIN bookings b ON b.availability = a.reference
+        GROUP BY r.reference, r.name
+        ORDER BY bookings DESC
+    `;
+
+    database.query(sql, (err, result) => {
+        if (err) {
+            console.log("reports query error", err);
+            res.status(500).send();
+        } else {
+            // return as array of { reference, name, bookings }
+            res.status(200).json(result);
+        }
+    });
+});
+
+
+// Reports endpoint: return booking counts grouped by hour (e.g. '09:00')
+app.get('/reports/timeCounts', (req, res) => {
+    const sql = `
+        SELECT DATE_FORMAT(a.start, '%H:00') AS hour_label, COUNT(b.reference) AS bookings
+        FROM availabilities a
+        LEFT JOIN bookings b ON b.availability = a.reference
+        GROUP BY hour_label
+        ORDER BY bookings DESC
+    `;
+
+    database.query(sql, (err, result) => {
+        if (err) {
+            console.log('timeCounts query error', err);
+            res.status(500).send();
+        } else {
+            res.status(200).json(result);
+        }
+    });
+});
+
+
 app.get("/request", (req, res) => {
     let { user, availability } = req.query
     if (availability == null) {
