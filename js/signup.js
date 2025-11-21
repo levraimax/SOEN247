@@ -16,13 +16,19 @@ function signup(e) {
     e.preventDefault();
     const form = document.querySelectorAll("div input[type='text']");
     const passwords = document.querySelectorAll("div input[type='password']");
-    const roles = document.querySelectorAll("div input[type='radio']:checked");
+    const roles = document.querySelector("input[type='radio']:checked");
 
-    if (every(form, (entry) => { return entry.value != "" }) && passwords[0].value == passwords[1].value && roles.length != 0) {
+    if (every(form, (entry) => { return entry.value != "" }) && passwords[0].value == passwords[1].value && roles != null) {
         sendQuery(e.target, "http://localhost:3000/signup", function () {
             if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
                 localStorage.setItem("user", e.target.netname.value)
-                window.location.href = '../html/profile.html';
+                if(roles.value == "admin") {
+                    window.location.href = '../html/adminLoged_in.html';
+                }
+                else{
+                    window.location.href = '../html/userLoged_in.html';
+                }
+                
             }
         })
     }
