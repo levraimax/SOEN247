@@ -10,9 +10,38 @@ let month = today.getMonth();
 let year = today.getFullYear();
 let day = today.getDate();
 
+let availMap = {};
 //function calcMaxHeight() {
 //    calendar.style.maxHeight = calendar.clientHeight+"px"
 //}
+async function loadCalendarData(){
+    try{
+        const resp = await fetch(`http://localhost:3000/availabilitiesWithBookings`);
+        if(!resp.ok) throw new Error("Failed to fetch availabilities");
+
+        const rows = await resp.json();
+        availMap = {};
+
+        for (const r of rows) {
+            const startDate = new Date(r.start);
+            const endDate = new Date(r.end);
+
+            const dateStr = `${startDate.getDate()}/${startDate.getMonth()+1}/${startDate.getFullYear()}`;
+            const startStr = startDate.toTimeString().slice(0,5);  // "HH:MM"
+            const endStr   = endDate.toTimeString().slice(0,5);
+
+            const entry = {
+                resource_name: r.resource_name || `#${r.resource}`,
+                booked_by: r.booked_by
+            };
+
+            addAvailability(dateStr, startStr, endStr, entry);
+        }
+    }catch(error){
+        console.error("Error loading calendar data: ", error);
+    }
+}
+
 
 function createDays() {
     if (days.length == 0) {
@@ -47,8 +76,9 @@ function createBooks() {
     if (bookings.length == 0) {
         for (let i = 0; i <= 14; i++) {
             calendar.appendChild(document.createElement('div')).classList.add("booking");
-            calendar.lastChild.textContent = `Booking ${i + 8}:00`;
-            calendar.lastChild.time = `${i + 8}:00`;
+            const hour = String(i + 8).padStart(2, '0');
+            calendar.lastChild.textContent = `Booking ${hour}:00`;
+            calendar.lastChild.time = `${hour}:00`;
             //displayRooms(calendar.lastChild);
             bookings.push(calendar.lastChild);
         }
@@ -99,22 +129,74 @@ function lastDay(year, month) {
     return new Date(year, month + 1, 0).getDate();
 }
 
+function generateTimeSlots(start, end, interval = 60) {
+    const slots = [];
+    const startTime = new Date(`1970-01-01T${start}:00`);
+    const endTime = new Date(`1970-01-01T${end}:00`);
+
+    while (startTime <= endTime) {
+        slots.push(startTime.toTimeString().slice(0, 5));  // "HH:MM"
+        startTime.setMinutes(startTime.getMinutes() + interval);
+    }
+    return slots;
+}
+
+function addAvailability(date, start, end, entry) {
+    const times = generateTimeSlots(start, end);
+
+    if (!availMap[date]) availMap[date] = {};
+
+    times.forEach(t => {
+        if (!availMap[date][t]) availMap[date][t] = [];
+        availMap[date][t].push(entry);
+    });
+}
+
+
 function getRoomAvailability(time, date) {
     // Get the rooms based on the time and date
     //let availabilities = JSON.parse(localStorage.getItem("availabilities"));
     //if (availabilities[date] == null || availabilities[date][time] == null) return [];
     //return availabilities[date][time].map(entry => entry.resource);
+    if(!date || !time) return [];
+    // normalize time to HH:MM (pad single-digit hours)
+    const parts = String(time).split(":");
+    const hour = parts[0].padStart(2, '0');
+    const minute = (parts[1] || '00').padStart(2, '0');
+    const key = `${hour}:${minute}`;
+    if(availMap[date] && availMap[date][key]){
+        return availMap[date][key].map(entry => ({
+            name: entry.resource_name || entry.resource,
+            booked: entry.booked_by != null
+        }));
+
+    }
     return [];
 }
 
 function displayRooms(book) {
-    //console.log(book.time,date)
+    //console.log(book.time,date);
     book.innerHTML = `Booking ${book.time}<br>`;
-    getRoomAvailability(book.time, date).forEach(room => book.innerHTML += `<br><span>${room}</span>`);
-}
+    const rooms = getRoomAvailability(book.time, date);
+    if(rooms.length === 0){
+        book.innerHTML +=  `<br><span style="color:gray">No slots</span>`;
+    } else {
+        rooms.forEach(room => {
+            if(room.booked){    
+                book.innerHTML += `<br><span style="color:darkred">${room.name} (booked)</span>`;
+            } else {
+                book.innerHTML += `<br><span style="color:green">${room.name} (available)</span>`;
+            }
+        });
+    }
+}   
 
 
-
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadCalendarData();
+    displayDays();
+    calendar.addEventListener("click", toggleDayBook);
+});
 
 function toggleDayBook(event) {
     if (event.target.classList.contains("day")) {

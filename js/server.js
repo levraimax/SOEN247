@@ -9,6 +9,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Simple request logger to help diagnose 404s from the client
+app.use((req, res, next) => {
+    console.log(new Date().toISOString(), req.method, req.originalUrl);
+    next();
+});
+
 let availabilities;
 
 const database = mysql.createConnection({
@@ -397,7 +403,7 @@ app.get('/reports/timeCounts', (req, res) => {
 });
 
 
-app.get("/request", (req, res) => {
+app.get("/request", async (req, res) => {
     let { user, availability } = req.query
     if (availability == null) {
         let { start, end, resource } = req.query;
@@ -421,22 +427,28 @@ app.get("/request", (req, res) => {
 
     } else if (user == null) {
         res.status(500).send("Invalid resource or user");
-    } else {
-        if (hasRoom(availability)) {
-            let sql = `INSERT INTO bookings (availability,user) VALUES (${availability},${user})`;
-            database.query(sql, (err, result) => {
-                if (err) {
-                    console.log(err);
-                    res.status(500).send("Failure");
-                } else {
-                    res.status(200).send("Success");
-                }
-            })
-        } else {
-            res.status(500).send("No room left");
+    } else if(availability && user){
+        try{
+            const roomAvailable = await hasRoom(availability);
+            if (roomAvailable) {
+                let sql = `INSERT INTO bookings (availability,user) VALUES (${availability},${user})`;
+                database.query(sql, (err, result) => {
+                    if(err){
+                        console.log(err);
+                        res.status(500).send("Failure");
+                    }else{
+                        res.status(200).send("Success");
+                    }
+                });
+            } else {
+                res.status(500).send("No available capacity");
+            }
+        }catch(err){
+            console.log(err);
+            res.status(500).send("Error checking availability");
         }
     }
-})
+});
 
 app.get("/updateRequest", (req, res) => {
     console.log("Updating request.. implement checking credentials");
@@ -458,6 +470,40 @@ app.get("/updateRequest", (req, res) => {
     }
 })
 
+app.get("/availabilitiesWithBookings", (req, res) => {
+    const sql = `
+    SELECT a.reference, a.start, a.end, a.resource, a.auth, r.name as resource_name, b.user as booked_by
+    FROM availabilities a
+    LEFT JOIN resources r ON a.resource = r.reference
+    LEFT JOIN bookings b ON a.reference = b.availability
+    `;
+    database.query(sql, (err, result) => {
+        if (err) {
+            console.log("availabilitiesWithBookings error: ", err);
+            res.status(500).send();
+        } else {
+            res.status(200).json(result);
+        }
+    });
+});
+
+// Fallback routes (case-insensitive/path variants) in case client requests a slightly different URL
+app.get(["/availabilitieswithbookings", "/api/availabilitiesWithBookings"], (req, res) => {
+    const sql = `
+    SELECT a.reference, a.start, a.end, a.resource, a.auth, r.name as resource_name, b.user as booked_by
+    FROM availabilities a
+    LEFT JOIN resources r ON a.resource = r.reference
+    LEFT JOIN bookings b ON a.reference = b.availability
+    `;
+    database.query(sql, (err, result) => {
+        if (err) {
+            console.log("availabilitiesWithBookings (fallback) error: ", err);
+            res.status(500).send();
+        } else {
+            res.status(200).json(result);
+        }
+    });
+});
 //app.get("/getstudent/:id", (req, res) => {
 //    let sql = `SELECT * FROM students WHERE student_id=${req.params.id}`;
 

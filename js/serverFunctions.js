@@ -220,3 +220,26 @@ function save(name) {
             break;
     }
 }
+
+function hasRoom(availability) {
+    return new Promise((resolve, reject)=>{
+        const sql = `
+            SELECT r.capacity, COUNT(b.reference) as booked_count
+            FROM availabilities a
+            JOIN resources r ON a.resource = r.reference
+            LEFT JOIN bookings b ON a.reference = b.availability
+            WHERE a.reference = ?
+            GROUP BY a.reference
+        `;
+        database.query(sql, [availability], (err, result)=>{
+            if(err){
+                reject(err);
+            }else if(result.length === 0){
+                resolve(false);
+            }else{
+                resolve(result[0].booked_count < result[0].capacity);
+            }
+        });
+    });
+}
+
