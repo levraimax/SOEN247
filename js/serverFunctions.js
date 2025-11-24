@@ -108,6 +108,8 @@ function sendResource(form) {
     })
 }
 
+
+// String formatted time
 function formatDateFromServer(date) {
     let d = new Date(date);
     return d.toLocaleString();
@@ -118,6 +120,7 @@ function formattedDate(date) {
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
     return d.toISOString().slice(0, 16);
 }
+
 
 function binToImageSrc(bin) {
     return "data:image/png;base64," + bin;
@@ -163,7 +166,7 @@ function indexOfReq(arr, req) {
     return -1;
 }
 
-function fileRequest(data,callback=None) {
+function fileRequest(data,callback=null) {
     let fd = new URLSearchParams(data);
     GET_SYNC("http://localhost:3000/request?"+fd.toString())
     //let index = indexOfBook(listings, data);
@@ -183,6 +186,10 @@ function fileRequest(data,callback=None) {
     //    // Maybe add a pending booking?
     //}
     //save("serverData");
+}
+
+function getResource(dp) {
+    return find(resources, (x) => { return x.reference == dp.resource })
 }
 
 function updateRequest(data, callback = None) {

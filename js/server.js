@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Simple request logger to help diagnose 404s from the client
 app.use((req, res, next) => {
-    console.log(new Date().toISOString(), req.method, req.originalUrl);
+    console.log((new Date()).toLocaleString(), req.method, req.originalUrl);
     next();
 });
 
@@ -63,7 +63,7 @@ app.get("/login", (req, res) => {
         database.query(sql, (err, result) => {
             if (!err && result.length > 0) {
                 console.log("admin", result[0].admin);
-                res.status(200).json([result[0].password == password, result[0].admin,result[0].reference]);
+                res.status(200).json([result[0].password == password, result[0].admin, result[0].reference]);
             } else {
                 res.status(200).send(false);
             }
@@ -403,56 +403,169 @@ app.get('/reports/timeCounts', (req, res) => {
 });
 
 
-app.get("/request", async (req, res) => {
-    let { user, availability } = req.query
-    if (availability == null) {
-        let { start, end, resource } = req.query;
-        start=formatDateTime(start)
-        end=formatDateTime(end)
+//app.get("/request", (req, res) => {
+//    let { user, availability } = req.query
+//    if (availability == null) {
+//        let { start, end, resource } = req.query;
 
-        if (start == null || end == null || resource == null) {
+//        start = formatDateTime(start)
+//        end = formatDateTime(end)
+
+//        if (start == null || end == null || resource == null) {
+//            res.status(500).send()
+//        } else {
+//            let sql = `INSERT INTO requests (user,start,end,resource) VALUES (?,?,?,?)`
+//            let params = [user, start, end, resource];
+//            database.query(sql, params, (err) => {
+//                if (err) {
+//                    console.log(err)
+//                    res.status(500).send()
+//                } else {
+//                    res.status(200).send()
+//                }
+//            })
+//        }
+//    } else if (user == null) {
+//        res.status(500).send("Invalid resource or user");
+//    } else {
+//        if (!hasRoom(availability)) {
+//            res.status(500).send("No room left");
+//        } else {
+//            res.status(200).send("Success")
+//        }
+//    }
+//})
+app.get("/request", (req, res) => {
+    let { user, reference, start, end } = req.query
+    console.log(start,end)
+    if (reference != null) {
+        if (user == null) {
             res.status(500).send()
-        } else {
-            let sql = `INSERT INTO requests (user,start,end,resource) VALUES (?,?,?,?)`
-            let params = [user, start, end, resource];
-            database.query(sql, params, (err) => {
+        } else if (start != null && end != null) {
+            // Specific range on an existing availability
+            start = new Date(formatDateTime(start))
+            end = new Date(formatDateTime(end))
+
+            let sql = `SELECT start, end, auth FROM availabilities WHERE reference = ?`
+            database.query(sql, [reference], (err, result) => {
                 if (err) {
                     console.log(err)
                     res.status(500).send()
                 } else {
-                    res.status(200).send()
+                    console.log(result)
+                    let aStart = result[0].start;
+                    let aEnd = result[0].end;
+
+                    if (start >= aStart && start < aEnd && end > start && end <= aEnd) {
+                        console.log("Valid request")
+                        // Create booking
+                        // Need to check auth to decide whether to request or book
+                        let auth = result[0].auth;
+                        if (auth) {
+                            // Make a request
+                            createRequest(reference, user, [start, end])
+                            res.status(200).send()
+                        } else {
+                            // Make a booking
+                            bookAvailability(reference, user, [start, end]);
+                            res.status(200).send()
+
+                        }
+                    } else {
+                        // No existing availabilities satisfy the range requested (custom request)
+                        let { resource } = req.query
+
+                        if (resource) {
+                            customRequest(user, resource, start, end)
+                            res.status(200).send();
+                        } else {
+                            res.status(500).send();
+                        }
+
+                    }
+                }
+            })
+        } else {
+            // Full range of the availability
+            let sql = `SELECT auth FROM availabilities WHERE reference = ?`
+            database.query(sql, [reference], (err, result) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send();
+                } else {
+                    if (result[0].auth) {
+                        // Create a request (full range)
+                        createRequest(reference, user)
+                        res.status(200).send();
+                    } else {
+                        // Create a booking (full range)
+                        bookAvailability(reference, user)
+                        res.status(200).send();
+                    }
                 }
             })
         }
-
-    } else if (user == null) {
-        res.status(500).send("Invalid resource or user");
-    } else if(availability && user){
-        try{
-            const roomAvailable = await hasRoom(availability);
-            if (roomAvailable) {
-                let sql = `INSERT INTO bookings (availability,user) VALUES (${availability},${user})`;
-                database.query(sql, (err, result) => {
-                    if(err){
-                        console.log(err);
-                        res.status(500).send("Failure");
-                    }else{
-                        res.status(200).send("Success");
-                    }
-                });
-            } else {
-                res.status(500).send("No available capacity");
-            }
-        }catch(err){
-            console.log(err);
-            res.status(500).send("Error checking availability");
+    } else {
+        // Create a new custom request
+        let { resource } = req.query
+        if (resource == null) {
+            res.status(500).send();
+        } else {
+            customRequest(user, resource, start, end);
+            res.status(200).send()
         }
     }
-});
+})
+
+// Making a request, assuming the availabiltiy exists
+function createRequest(availability, user, range = null) {
+    console.log("CREATE REQUEST")
+    //	availability	user	start	end (request format)
+    if (range) {
+        let [start, end] = range;
+        let sql = `INSERT INTO requests (availability,user,start,end) VALUES (?,?,?,?)`
+        database.query(sql, [availability, user, start, end], (err) => {
+            if (err) console.log(err);
+        })
+    } else {
+        let sql = `INSERT INTO requests (availability,user,start,end) SELECT ?, ?, start, end FROM availabilities WHERE reference = ?`
+        database.query(sql, [availability, user, availability], (err) => {
+            if (err) console.log(err);
+        })
+    }
+}
+
+
+// Accepted custom requests create an availability with capacity 1
+function customRequest(user, resource, start, end) {
+    console.log("CUSTOM REQUEST")
+    let sql = `INSERT INTO requests (user,resource,start,end) VALUES (?,?,?,?)`
+    database.query(sql, [user, resource, start, end], (err) => {
+        if (err) console.log(err);
+    })
+}
+
+function bookAvailability(availability, user, range = null) {
+    console.log("BOOK AVAILABILITY")
+    if (range) {
+        // Specific range
+        let sql = `INSERT INTO bookings (availability,user,start,end) VALUES (?,?,?,?)`
+        let [start, end] = range;
+        database.query(sql, [availability, user, start, end], (err) => {
+            if (err) console.log(err);
+        })
+    } else {
+        // Full range
+        let sql = `INSERT INTO bookings (availability, user, start, end) SELECT ?, ?, start, end FROM availabilities WHERE reference = ?`
+        database.query(sql, [availability, user, availability], (err) => {
+            if (err) console.log(err)
+        })
+    }
+}
 
 app.get("/updateRequest", (req, res) => {
     console.log("Updating request.. implement checking credentials");
-    let {reference, start, end, resource } = req.query;
+    let { reference, start, end, resource } = req.query;
 
     if (reference == null || start == null || end == null || resource == null) {
         res.status(500).send()
@@ -470,40 +583,40 @@ app.get("/updateRequest", (req, res) => {
     }
 })
 
-app.get("/availabilitiesWithBookings", (req, res) => {
-    const sql = `
-    SELECT a.reference, a.start, a.end, a.resource, a.auth, r.name as resource_name, b.user as booked_by
-    FROM availabilities a
-    LEFT JOIN resources r ON a.resource = r.reference
-    LEFT JOIN bookings b ON a.reference = b.availability
-    `;
-    database.query(sql, (err, result) => {
-        if (err) {
-            console.log("availabilitiesWithBookings error: ", err);
-            res.status(500).send();
-        } else {
-            res.status(200).json(result);
-        }
-    });
-});
+//app.get("/availabilitiesWithBookings", (req, res) => {
+//    const sql = `
+//    SELECT a.reference, a.start, a.end, a.resource, a.auth, r.name as resource_name, b.user as booked_by
+//    FROM availabilities a
+//    LEFT JOIN resources r ON a.resource = r.reference
+//    LEFT JOIN bookings b ON a.reference = b.availability
+//    `;
+//    database.query(sql, (err, result) => {
+//        if (err) {
+//            console.log("availabilitiesWithBookings error: ", err);
+//            res.status(500).send();
+//        } else {
+//            res.status(200).json(result);
+//        }
+//    });
+//});
 
-// Fallback routes (case-insensitive/path variants) in case client requests a slightly different URL
-app.get(["/availabilitieswithbookings", "/api/availabilitiesWithBookings"], (req, res) => {
-    const sql = `
-    SELECT a.reference, a.start, a.end, a.resource, a.auth, r.name as resource_name, b.user as booked_by
-    FROM availabilities a
-    LEFT JOIN resources r ON a.resource = r.reference
-    LEFT JOIN bookings b ON a.reference = b.availability
-    `;
-    database.query(sql, (err, result) => {
-        if (err) {
-            console.log("availabilitiesWithBookings (fallback) error: ", err);
-            res.status(500).send();
-        } else {
-            res.status(200).json(result);
-        }
-    });
-});
+//// Fallback routes (case-insensitive/path variants) in case client requests a slightly different URL
+//app.get(["/availabilitieswithbookings", "/api/availabilitiesWithBookings"], (req, res) => {
+//    const sql = `
+//    SELECT a.reference, a.start, a.end, a.resource, a.auth, r.name as resource_name, b.user as booked_by
+//    FROM availabilities a
+//    LEFT JOIN resources r ON a.resource = r.reference
+//    LEFT JOIN bookings b ON a.reference = b.availability
+//    `;
+//    database.query(sql, (err, result) => {
+//        if (err) {
+//            console.log("availabilitiesWithBookings (fallback) error: ", err);
+//            res.status(500).send();
+//        } else {
+//            res.status(200).json(result);
+//        }
+//    });
+//});
 //app.get("/getstudent/:id", (req, res) => {
 //    let sql = `SELECT * FROM students WHERE student_id=${req.params.id}`;
 

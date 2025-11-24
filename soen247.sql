@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 20, 2025 at 04:54 PM
+-- Generation Time: Nov 24, 2025 at 09:24 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,7 +40,8 @@ CREATE TABLE `availabilities` (
 --
 
 INSERT INTO `availabilities` (`reference`, `start`, `end`, `resource`, `auth`) VALUES
-(19, '2025-11-19 09:40:00', '2025-11-20 09:40:00', 57, 1);
+(19, '2025-11-19 09:40:00', '2025-11-20 09:40:00', 57, 0),
+(20, '2025-11-19 08:00:00', '2025-11-19 15:00:00', 57, 0);
 
 -- --------------------------------------------------------
 
@@ -51,8 +52,17 @@ INSERT INTO `availabilities` (`reference`, `start`, `end`, `resource`, `auth`) V
 CREATE TABLE `bookings` (
   `reference` int(11) NOT NULL,
   `availability` int(11) NOT NULL,
-  `user` int(11) NOT NULL
+  `user` int(11) NOT NULL,
+  `start` datetime NOT NULL,
+  `end` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bookings`
+--
+
+INSERT INTO `bookings` (`reference`, `availability`, `user`, `start`, `end`) VALUES
+(38, 20, 2, '2025-11-19 08:23:00', '2025-11-19 09:23:00');
 
 -- --------------------------------------------------------
 
@@ -68,6 +78,13 @@ CREATE TABLE `requests` (
   `end` datetime DEFAULT NULL,
   `resource` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `requests`
+--
+
+INSERT INTO `requests` (`reference`, `availability`, `user`, `start`, `end`, `resource`) VALUES
+(26, NULL, 2, '2025-11-19 08:23:00', '2025-11-28 15:23:00', 57);
 
 -- --------------------------------------------------------
 
@@ -175,19 +192,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `availabilities`
 --
 ALTER TABLE `availabilities`
-  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `requests`
 --
 ALTER TABLE `requests`
-  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `reference` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `resources`

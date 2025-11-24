@@ -17,21 +17,35 @@ function getAvailability(ref) {
 }
 
 function getBookings() {
-    bookings = GET_SYNC("http:localhost:3000/")
+    bookings = GET_SYNC(`http:localhost:3000/booksData?user=${user_reference}`)
 }
 
-function getResource(dp) {
-    return find(resources, (x) => { return x.reference == dp.resource })
-}
+//function getResource(dp) {
+//    return find(resources, (x) => { return x.reference == dp.resource })
+//}
 
 function loadData() {
     let data = USER_DATA(2);
     bookings = data.bookings;
+    for (let book of bookings) {
+        let resource = getResource(book.availability)
+        book.displayName = `${resource.name} (${resource.reference})`
+        book.pending = false;
+    }
+
     requests = data.requests;
+
+    alert("Pending displaying might not function")
+    for (let req of requests) {
+        let resource = (req.availability != null) ? getResource(req.availability) : find(resources, (x) => x.reference == req.resource)
+        req.displayName = `${resource.name} (${resource.reference})`
+        req.pending = true;
+    }
 }
 
 
 function load() {
+    loadAvailabilities();
     loadResources();
     loadData()
 
@@ -89,7 +103,7 @@ function displayBookings() {
     //    displayBooking(book);
     //}
 
-    for (let book of bookings) displayBooking(book.availability)
+    for (let book of bookings) displayBooking(book)
 
     //for (let pending of serverData[user]["pending"]) {
     //    displayPending(pending);
@@ -107,7 +121,8 @@ function displayBooking(book) {
     //booking.appendChild(document.createElement("div")).textContent = book.resource;
     //booking.appendChild(document.createElement("div")).textContent = book.time;     // Start
     //booking.appendChild(document.createElement("div")).textContent = book.date;     // End
-    booking.appendChild(document.createElement("div")).textContent = getResource(book).displayName
+
+    booking.appendChild(document.createElement("div")).textContent = book.displayName;
     booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(book.start);     // Start
     booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(book.end);     // End
     booking.appendChild(document.createElement("button")).textContent = "Modify";
@@ -120,20 +135,21 @@ function displayPending(pending) {
     listingsElem.appendChild(document.createElement("div")).classList.add("booking");
     let booking = listingsElem.lastChild;
     booking.classList.add("pending");
-    let temp = pending
+    //let temp = pending
 
-    if (pending.availability != null) {
-        temp = pending.availability;
-    }
-    console.log(pending)
+    //if (pending.availability != null) {
+    //    temp = pending.availability;
+    //}
     booking.reference = pending.reference
-    booking.data = temp;
+    //booking.data = temp;
+    booking.data = pending;
     //booking.appendChild(document.createElement("div")).textContent = temp.resource;
     //booking.appendChild(document.createElement("div")).textContent = temp.time;
     //booking.appendChild(document.createElement("div")).textContent = temp.date;
-    booking.appendChild(document.createElement("div")).textContent = getResource(temp).displayName;
-    booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(temp.start);
-    booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(temp.end);
+    //booking.appendChild(document.createElement("div")).textContent = getResource(temp).displayName;
+    booking.appendChild(document.createElement("div")).textContent = pending.displayName;
+    booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(pending.start);
+    booking.appendChild(document.createElement("div")).textContent = formatDateFromServer(pending.end);
     booking.appendChild(document.createElement("div")).textContent = "Approval pending";
     booking.appendChild(document.createElement("button")).textContent = "Modify";
     let right = booking.appendChild(document.createElement("button"))
@@ -191,12 +207,19 @@ function requestClick(button) {
             //let res = { "user": user, "resource": rResource.value, "time": rTime.value, "date": rDate.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
             let selected = rResource.selectedOptions[0]
             let res = { "user": user_reference, "resource": selected.data.reference, "start": rTime.value, "end": rDate.value }
+
+            let existing = find(availabilities, (av) => {
+                return av.resource == res.resource && new Date(av.start) <= new Date(res.start) && new Date(res.end) <= new Date(av.end); 
+            })
+
+            if (existing) res.reference = existing.reference
+
             //console.log(res)
             // Check if it is in listings (and not auth)
 
             // Add it to the requests
             //let serverRequests = JSON.parse(localStorage.getItem("requests"));
-            //serverRequests.push(res)
+            //serverRequests.push(res) 
             //localStorage.setItem("requests", JSON.stringify(serverRequests));
             fileRequest(res, loadData);
             break;
@@ -238,8 +261,25 @@ function buttonModifyClick(button) {
 
             //let res = { "user": user, "resource": resource.value, "time": time.value, "date": date.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1") }
             let selected = resource.selectedOptions[0];
-            let res = { "user": user_reference, "resource": selected.data.reference, "start": time.value, "end": date.value, "reference": toModify.reference }
-            updateRequest(res, loadData)
+            let res = { "user": user_reference, "resource": selected.data.reference, "start": time.value, "end": date.value, "reference": toModify.data.reference }
+            // The reference is a requests reference, not a booking reference?
+            //console.log(res);
+            //alert("DID NOT UPDATE BOOK/REQUEST (TESTING)")
+            if (toModify.data.pending) {
+                // Update req
+                updateRequest(res,loadData)
+            } else {
+                // Booking
+                // Delete booking
+                let fd = new URLSearchParams(res);
+                GET_SYNC("http://localhost:3000/deleteBooking?" + fd.toString());
+                res.reference = toModify.data.availability.reference;
+                fileRequest(res,loadData)
+                // fileRequest
+            }
+
+
+            //updateRequest(res, loadData)
 
 
             //let serverData = JSON.parse(localStorage.getItem("serverData"));
@@ -312,7 +352,9 @@ function buttonClick(button) {
         case "Modify":
             //alert(button.textContent + ", " + data.resource + " " + data.time + " " + data.date);
             showSidebar();
-            resource.value = getResource(data).displayName;
+            //console.log(data);
+            //resource.value = getResource(data).displayName;
+            resource.value = data.displayName
             time.value = formattedDate(data.start)
             date.value = formattedDate(data.end);
             //date.value = data.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1");
@@ -336,7 +378,7 @@ function buttonClick(button) {
             ////console.log(button.closest(".booking"))
             if (!button.closest(".booking").classList.contains("pending")) {
                 //remove(serverData[user]["bookings"], data);
-                GET_SYNC(`http://localhost:3000/deleteBooking?reference=${toModify.reference}`)
+                GET_SYNC(`http://localhost:3000/deleteBooking?reference=${toModify.data.reference}`)
                 loadData();
             } else {
                 //remove(serverData[user]["pending"], data);
