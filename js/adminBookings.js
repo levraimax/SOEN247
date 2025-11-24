@@ -66,10 +66,10 @@ function displayRequest(req) {
     let div = requestsElem.appendChild(document.createElement("div"));
     div.classList.add("request");
     div.data = req;
-    div.appendChild(document.createElement("span")).textContent = req.resource;
-    div.appendChild(document.createElement("span")).textContent = req.time;
-    div.appendChild(document.createElement("span")).textContent = req.date;
-    div.appendChild(document.createElement("span")).textContent = req.user;
+    div.appendChild(document.createElement("span")).textContent = `${req.name} (${req.resource})`;
+    div.appendChild(document.createElement("span")).textContent = formatDateFromServer(req.start);
+    div.appendChild(document.createElement("span")).textContent = formatDateFromServer(req.end);
+    div.appendChild(document.createElement("span")).textContent = req.netname;
     //requests.appendChild(document.createElement("button")).textContent = "\u2713";
     //requests.appendChild(document.createElement("button")).textContent = "\u0078";
 }
@@ -93,33 +93,48 @@ function displayApproval(target, visibility = true) {
 }
 
 function requestDecision(decision) {
-    //let reqData = JSON.parse(localStorage.getItem("requests"));
-    remove(requests, requestTarget.data);
+    console.log(requestTarget.data)
 
-    //let serverData = JSON.parse(localStorage.getItem("serverData"));
-    remove(serverData[requestTarget.data.user]["pending"], requestTarget.data);
-    let temp = requestTarget.data.user;
-
-    if (decision) {
-        //let serverData = JSON.parse(localStorage.getItem("serverData"));
-        // Remove the user from the req.data
-        cancel(requestTarget.data);
-
-        delete requestTarget.data["user"];
-        serverData[temp]["bookings"].push(requestTarget.data);
+    if (!decision) {
+        // Declined
+        let fd = new URLSearchParams(requestTarget.data);
+        GET_SYNC("http://localhost:3000/deleteRequest?" + fd.toString())
+        
+    } else {
+        //Approved
+        GET_SYNC(`http://localhost:3000/approveRequest?request=${requestTarget.data.reference}`);
+        loadListings();
     }
 
-    appendHistory(`${user} ${decision ? "approved" : "denied"} booking request: ${requestTarget.data.resource} at ${requestTarget.data.time} on ${requestTarget.data.date} from ${temp}`, true);
-    appendHistory(`Booking request for ${requestTarget.data.resource} at ${requestTarget.data.time} on ${requestTarget.data.date} was ${decision ? "approved" : "denied"}.`, false, temp)
-    //appendHistory()
-
-    requestTarget = null;
-    //localStorage.setItem("serverData", JSON.stringify(serverData));
-    //localStorage.setItem("requests", JSON.stringify(reqData));
-    save("serverData")
-    save("requests")
-
+    loadRequests();
     displayRequests();
+    ////let reqData = JSON.parse(localStorage.getItem("requests"));
+    //remove(requests, requestTarget.data);
+
+    ////let serverData = JSON.parse(localStorage.getItem("serverData"));
+    //remove(serverData[requestTarget.data.user]["pending"], requestTarget.data);
+    //let temp = requestTarget.data.user;
+
+    //if (decision) {
+    //    //let serverData = JSON.parse(localStorage.getItem("serverData"));
+    //    // Remove the user from the req.data
+    //    cancel(requestTarget.data);
+
+    //    delete requestTarget.data["user"];
+    //    serverData[temp]["bookings"].push(requestTarget.data);
+    //}
+
+    //appendHistory(`${user} ${decision ? "approved" : "denied"} booking request: ${requestTarget.data.resource} at ${requestTarget.data.time} on ${requestTarget.data.date} from ${temp}`, true);
+    //appendHistory(`Booking request for ${requestTarget.data.resource} at ${requestTarget.data.time} on ${requestTarget.data.date} was ${decision ? "approved" : "denied"}.`, false, temp)
+    ////appendHistory()
+
+    //requestTarget = null;
+    ////localStorage.setItem("serverData", JSON.stringify(serverData));
+    ////localStorage.setItem("requests", JSON.stringify(reqData));
+    //save("serverData")
+    //save("requests")
+
+    //displayRequests();
     displayApproval(null, false);
 }
 

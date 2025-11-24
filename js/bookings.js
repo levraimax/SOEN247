@@ -35,7 +35,6 @@ function loadData() {
 
     requests = data.requests;
 
-    alert("Pending displaying might not function")
     for (let req of requests) {
         let resource = (req.availability != null) ? getResource(req.availability) : find(resources, (x) => x.reference == req.resource)
         req.displayName = `${resource.name} (${resource.reference})`

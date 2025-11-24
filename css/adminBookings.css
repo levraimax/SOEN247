@@ -105,6 +105,20 @@ ul {
         margin-bottom: 2px;
     }
 
+.request {
+    display:flex;
+    text-align:center;
+    height:fit-content;
+}
+
+.request span {
+    height:stretch;
+    align-items:center;
+}
+
+
+
+
 
 .requests {
     width: 100%;
@@ -126,7 +140,7 @@ ul {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        height: calc(100%/13);
+        /*height: calc(100%/13);*/
         background-color:lightgray;
     }
 

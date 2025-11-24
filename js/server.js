@@ -284,7 +284,7 @@ app.get("/updateResource", (req, res) => {
 })
 
 app.get("/deleteResource", (req, res) => {
-    console.log("Deleting resource.. implement checking credentials")
+    console.log("Deleting resource.. implement checking credentials (ADMIN ONLY)")
     let resource = req.query.reference;
     let sql = `DELETE FROM resources WHERE reference = ${resource}`
     database.query(sql, (err) => {
@@ -297,7 +297,7 @@ app.get("/deleteResource", (req, res) => {
 })
 
 app.get("/deleteRequest", (req, res) => {
-    console.log("Deleting request.. implement checking credentials")
+    console.log("Deleting request.. implement checking credentials (ADMIN ONLY)")
     let { reference } = req.query;
     let sql = `DELETE FROM requests WHERE reference = ${reference}`
     database.query(sql, (err) => {
@@ -309,8 +309,78 @@ app.get("/deleteRequest", (req, res) => {
     })
 })
 
+app.get("/approveRequest", (req, res) => {
+    console.log("Approving request.. implement checking credentials (ADMIN ONLY)")
+    // 1. All that matters is the request reference
+    let { request } = req.query;
+    // 2. Get the request
+    let sql = `SELECT * FROM requests WHERE reference = ?`
+    database.query(sql, [request], (err, result) => {
+        if (err) {
+            console.log(err)
+            res.status(500).send();
+        } else {
+            // 3. Is the availability null (custom)
+            result=result[0]
+            if (result.availability == null) {
+                // Yes: make an availability and book that availability
+                let sql = `INSERT INTO availabilities (resource,start,end,auth) VALUES (?,?,?,1)`
+                database.query(sql, [result.resource, result.start, result.end], (err, newAv) => {
+                    if (err) {
+                        console.log(err)
+                        res.status(500).send()
+                    } else {
+                        // Successfully created, now book it
+                        let sql = `INSERT INTO bookings (user,availability,start,end) VALUES (?,?,?,?)`
+                        database.query(sql, [result.user, newAv.insertId, result.start, result.end], (err) => {
+                            if (err) {
+                                console.log(err)
+                                res.status(500).send()
+                            } else {
+                                // Delete the request
+                                let sql = `DELETE FROM requests WHERE reference = ?`
+                                database.query(sql, [request], (err) => {
+                                    if (err) {
+                                        console.log(err)
+                                        res.status(500).send();
+                                    } else {
+                                        // Completed with no failure
+                                        res.status(200).send()
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            } else {
+                // No: Create a booking
+                let sql = `INSERT INTO bookings (user,availability,start,end) VALUES (?,?,?,?)`
+                database.query(sql, [result.user, result.availability, result.start, result.end], (err) => {
+                    if (err) {
+                        console.log(err)
+                        res.status(500).send()
+                    } else {
+                        // Delete the request
+                        let sql = `DELETE FROM requests WHERE reference = ?`
+                        database.query(sql, [request], (err) => {
+                            if (err) {
+                                console.log(err)
+                                res.status(500).send();
+                            } else {
+                                // Completed with no failure
+                                res.status(200).send()
+                            }
+                        })
+                    }
+                })
+            }
+        }
+    })
+    
+})
+
 app.get("/deleteBooking", (req, res) => {
-    console.log("Deleting booking.. implement checking credentials")
+    console.log("Deleting booking.. implement checking credentials (USER ONLY)")
     console.log("Deleting booking.. IMPLEMENT CAPACITY")
     let { reference } = req.query;
     let sql = `DELETE FROM bookings WHERE reference = ${reference}`
@@ -346,8 +416,8 @@ app.get("/availabilities", (req, res) => {
 })
 
 app.get("/requests", (req, res) => {
-    console.log("Obtaining requests.. implement checking credentials")
-    let sql = "SELECT * FROM requests";
+    console.log("Obtaining requests.. implement checking credentials (ADMIN ONLY)")
+    let sql = "SELECT requests.*, users.netname, resources.name FROM requests INNER JOIN users ON requests.user = users.reference INNER JOIN resources ON requests.resource = resources.reference";
     database.query(sql, (err, result) => {
         if (err) {
             console.log(err)
