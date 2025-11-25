@@ -75,12 +75,18 @@ app.get("/signup", (req, res) => {
     //console.log(req.query);
     let { netname, firstName, lastName, email, role, password } = req.query;
     let params = [netname, firstName, lastName, email, (role == "admin") ? 1 : 0, password]
+    console.log(req.cookies)
     let sql = `INSERT INTO users (netname,name,last_name,email,admin,password) VALUES (?,?,?,?,?,?)`
-    database.query(sql, params, (err) => {
+    database.query(sql, params, (err,result) => {
         if (err) {
             console.log(err);
             res.status(500).send();
         } else {
+            res.cookie("credentials", generateKey(result.insertId), {
+                maxAge: 3600E3,
+                httpOnly: true, // The cookie will not be available to Console on browser through document.cookiessecure: false, // use true if using https
+                secure: true
+            });
             res.status(200).send();
         }
     })
@@ -91,20 +97,19 @@ app.get("/login", (req, res) => {
     let password = req.query.password;
 
     if (netname == null || password == null) {
-
+        res.status(500).send();
     } else {
         let sql = `SELECT password, admin, reference FROM users WHERE netname = '${netname}'`
         database.query(sql, (err, result) => {
             if (!err && result.length > 0) {
-                console.log("admin", result[0].admin);
 
-                res.cookie("credentials", generateKey(result[0].reference), {
-                    maxAge: 3600E3,
-                    httpOnly: true, // The cookie will not be available to Console on browser through document.cookiessecure: false, // use true if using https
-                    secure: true
-                });
-
-
+                if (!req.cookies.credentials) {
+                    res.cookie("credentials", generateKey(result[0].reference), {
+                        maxAge: 3600E3,
+                        httpOnly: true, // The cookie will not be available to Console on browser through document.cookiessecure: false, // use true if using https
+                        secure: true
+                    });
+                }
                 res.status(200).json([result[0].password == password, result[0].admin, result[0].reference]);
             } else {
                 res.status(200).send(false);
@@ -503,7 +508,7 @@ app.get("/deleteBooking", authenticate, requireAdmin, (req, res) => {
     });
 })
 
-app.get("/resources",authenticate, (req, res) => {
+app.get("/resources", authenticate, (req, res) => {
     let sql = "SELECT reference,name,description,location,capacity,blocked FROM resources";
     database.query(sql, (err, result) => {
         if (err) {
@@ -514,7 +519,7 @@ app.get("/resources",authenticate, (req, res) => {
     })
 })
 
-app.get("/availabilities", authenticate,(req, res) => {
+app.get("/availabilities", authenticate, (req, res) => {
     let sql = "SELECT * FROM availabilities";
     database.query(sql, (err, result) => {
         if (err) {
@@ -525,7 +530,7 @@ app.get("/availabilities", authenticate,(req, res) => {
     })
 })
 
-app.get("/requests",authenticate, requireAdmin, (req, res) => {
+app.get("/requests", authenticate, requireAdmin, (req, res) => {
     console.log("Obtaining requests.. implement checking credentials (ADMIN ONLY)")
     let sql = "SELECT requests.*, users.netname, resources.name FROM requests INNER JOIN users ON requests.user = users.reference INNER JOIN resources ON requests.resource = resources.reference";
     database.query(sql, (err, result) => {
@@ -540,7 +545,7 @@ app.get("/requests",authenticate, requireAdmin, (req, res) => {
 
 
 // Reports endpoint: return booking counts per resource
-app.get("/reports/resourceCounts", authenticate,(req, res) => {
+app.get("/reports/resourceCounts", authenticate, (req, res) => {
     const sql = `
         SELECT r.reference, r.name, COUNT(b.reference) AS bookings
         FROM resources r
@@ -563,7 +568,7 @@ app.get("/reports/resourceCounts", authenticate,(req, res) => {
 
 
 // Reports endpoint: return booking counts grouped by hour (e.g. '09:00')
-app.get('/reports/timeCounts',authenticate, (req, res) => {
+app.get('/reports/timeCounts', authenticate, (req, res) => {
     const sql = `
         SELECT DATE_FORMAT(a.start, '%H:00') AS hour_label, COUNT(b.reference) AS bookings
         FROM availabilities a
@@ -615,7 +620,7 @@ app.get('/reports/timeCounts',authenticate, (req, res) => {
 //        }
 //    }
 //})
-app.get("/request", authenticate,(req, res) => {
+app.get("/request", authenticate, (req, res) => {
     let { reference, start, end } = req.query
     let user = req.user;
     console.log(start, end)
