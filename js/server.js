@@ -63,6 +63,21 @@ database.connect((err) => {
         console.log("Failed to connect to database", err);
     } else {
         console.log("Connected to database");
+        // Ensure audit table exists for recording admin events (availability creation etc.)
+        const createAuditSql = `
+            CREATE TABLE IF NOT EXISTS audit_events (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                event_type VARCHAR(80) NOT NULL,
+                availability_ref INT NULL,
+                resource INT NULL,
+                details TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        `;
+        database.query(createAuditSql, (err) => {
+            if (err) console.error('Failed to ensure audit_events table exists:', err);
+            else console.log('audit_events table ready');
+        });
         //database.query("SELECT * FROM availabilities", (err, result) => {
         //    availabilities = result;
         //    console.log(availabilities);
@@ -260,16 +275,25 @@ app.get("/createAvailability", authenticate, requireAdmin, (req, res) => {
     } else {
         start = formatDateTime(start)
         end = formatDateTime(end)
-        let sql = `INSERT INTO availabilities (resource,start,end,auth) VALUES (${resource},'${start}','${end}','${auth}')`
-        //console.log("HERE\t", sql);
-        database.query(sql, (err) => {
+        // Use parameterized insert so we can get insertId and record an audit event
+        const sql = `INSERT INTO availabilities (resource,start,end,auth) VALUES (?, ?, ?, ?)`;
+        const params = [resource, start, end, auth];
+        database.query(sql, params, (err, result) => {
             if (err) {
                 console.log(err);
                 res.status(500).send();
             } else {
-                res.status(200).send();
+                const availRef = result.insertId;
+                // record audit event
+                const details = JSON.stringify({ start, end });
+                const auditSql = `INSERT INTO audit_events (event_type, availability_ref, resource, details) VALUES (?, ?, ?, ?)`;
+                database.query(auditSql, ['availability_created', availRef, resource, details], (err) => {
+                    if (err) console.error('Failed to insert audit event:', err);
+                    // reply to client regardless of audit insert result
+                    res.status(200).send();
+                });
             }
-        })
+        });
     }
 
 
@@ -894,6 +918,58 @@ app.get("/updateRequest", authenticate, (req, res) => {
 //    }
 //    return [res.join(" AND"), res.length > 0];
 //}
+
+app.get("/bookings-history", authenticate, (req, res) => {
+    const sql = `
+        SELECT 
+            b.reference,
+            b.availability,
+            b.user,
+            b.start,
+            b.end,
+            u.netname,
+            u.name as user_name,
+            u.last_name
+        FROM bookings b
+        LEFT JOIN users u ON b.user = u.reference
+        ORDER BY b.start DESC
+    `;
+    
+    database.query(sql, (err, result) => {
+        if (err) {
+            console.log("bookings-history query error", err);
+            res.status(500).send();
+        } else {
+            res.status(200).json(result);
+        }
+    });
+});
+
+// Admin history endpoint - returns audit events (newest first)
+app.get("/request-history", authenticate, (req, res) => {
+    const sql = `
+        SELECT r.*,
+        u.netname,
+        u.name,
+        u.last_name,
+        processor.netname as process_by_netname, 
+        res.name as resouce_name
+        FROM requests r
+        LEFT JOIN users u ON r.user = u.reference
+        LEFT JOIN users Processor ON r.processed_by = processor.reference
+        LEFT JOIN resrouces res ON r.resource = res.reference
+        WHERE r.status != 'pending'
+        ORDER BY r.processed_at DESC
+        `;
+        database.query(sql, (err, result) => {
+        if (err) {
+            console.error('Failed to query audit_events:', err);
+            res.status(500).send();
+        } else {
+            res.status(200).json(result);
+        }
+    });
+});
 
 
 

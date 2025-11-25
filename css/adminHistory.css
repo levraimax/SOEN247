@@ -75,28 +75,87 @@ ul {
                 background-color: #111111;
             }
 
-.contents {
-    height: 100%;
-    width: 70%;
-    position: relative;
-    left: 50%;
-    transform: translate(-50%);
-    background-color: white;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    align-content: flex-start;
-    padding:10px;
-    font-size: 20px;
-    font-family: "Segoe UI", Arial, sans-serif;
-    color: #333;
-    line-height: 1.5;
-    margin: 10px 0;
-    
+.filter-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 5px;
 }
 
-.line{
+.filter-section label {
+    margin-right: 20px;
+}
+
+.filter-section select {
+    padding: 5px 10px;
+    margin-left: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.history-table {
     width: 100%;
-    border-bottom: 2px solid #ccc;
-    margin: 8px 0;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.history-table th,
+.history-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.history-table th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+}
+
+.history-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.action-badge {
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.action-badge.booking {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.action-badge.availability {
+    background-color: #2196F3;
+    color: white;
+}
+
+.action-badge.request {
+    background-color: #FF9800;
+    color: white;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.status-badge.active {
+    background-color: #8BC34A;
+    color: white;
+}
+
+.status-badge.completed {
+    background-color: #9E9E9E;
+    color: white;
+}
+
+.status-badge.pending {
+    background-color: #FFC107;
+    color: black;
 }
