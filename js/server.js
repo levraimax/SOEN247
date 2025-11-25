@@ -27,6 +27,7 @@ function generateKey(user) {
 }
 
 function authenticate(req, res, next) {
+    console.log(credentials)
     const key = req.cookies.credentials;
     if (key && credentials[key]) {
         // Attach user info to request for downstream use
@@ -92,7 +93,7 @@ app.get("/signup", (req, res) => {
     let params = [netname, firstName, lastName, email, (role == "admin") ? 1 : 0, password]
     console.log(req.cookies)
     let sql = `INSERT INTO users (netname,name,last_name,email,admin,password) VALUES (?,?,?,?,?,?)`
-    database.query(sql, params, (err,result) => {
+    database.query(sql, params, (err, result) => {
         if (err) {
             console.log(err);
             res.status(500).send();
@@ -118,13 +119,14 @@ app.get("/login", (req, res) => {
         database.query(sql, (err, result) => {
             if (!err && result.length > 0) {
 
-                if (!req.cookies.credentials) {
-                    res.cookie("credentials", generateKey(result[0].reference), {
-                        maxAge: 3600E3,
-                        httpOnly: true, // The cookie will not be available to Console on browser through document.cookiessecure: false, // use true if using https
-                        secure: true
-                    });
-                }
+                //if (!req.cookies.credentials) {
+                //console.log(result[0].reference)
+                res.cookie("credentials", generateKey(result[0].reference), {
+                    maxAge: 3600E3,
+                    httpOnly: true, // The cookie will not be available to Console on browser through document.cookiessecure: false, // use true if using https
+                    secure: true
+                });
+                //}
                 res.status(200).json([result[0].password == password, result[0].admin, result[0].reference]);
             } else {
                 res.status(200).send(false);
@@ -934,7 +936,7 @@ app.get("/bookings-history", authenticate, (req, res) => {
         LEFT JOIN users u ON b.user = u.reference
         ORDER BY b.start DESC
     `;
-    
+
     database.query(sql, (err, result) => {
         if (err) {
             console.log("bookings-history query error", err);
@@ -961,7 +963,7 @@ app.get("/request-history", authenticate, (req, res) => {
         WHERE r.status != 'pending'
         ORDER BY r.processed_at DESC
         `;
-        database.query(sql, (err, result) => {
+    database.query(sql, (err, result) => {
         if (err) {
             console.error('Failed to query audit_events:', err);
             res.status(500).send();
