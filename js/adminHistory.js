@@ -27,7 +27,6 @@ function displayHistory() {
                 <option value="">All Actions</option>
                 <option value="BOOKING">Bookings</option>
                 <option value="AVAILABILITY">Availabilities</option>
-                <option value="REQUEST">Pending Requests</option>
             </select>
         </label>
         <label>Filter by resource: 
@@ -35,7 +34,7 @@ function displayHistory() {
                 <option value="">All Resources</option>
             </select>
         </label>
-    `;
+    `;//<option value="REQUEST">Pending Requests</option>
     contents.appendChild(filterDiv);
     
     // Create table
@@ -160,21 +159,21 @@ function combineHistory(bookings, availabilities, requests, resources) {
     });
     
     // Add pending requests to history
-    requests.forEach(r => {
-        let resourceName = r.name || resourceMap[r.resource];
-        history.push({
-            timestamp: r.start, // Request start time
-            type: 'REQUEST',
-            action: 'Request Submitted',
-            user: r.netname || 'User',
-            netname: r.netname || 'unknown',
-            details: `Requested ${resourceName} from ${formatDateTime(r.start)} to ${formatDateTime(r.end)}`,
-            resource_name: resourceName,
-            resource_id: r.resource,
-            status: 'Pending',
-            reference: r.reference
-        });
-    });
+    // requests.forEach(r => {
+    //     let resourceName = r.name || resourceMap[r.resource];
+    //     history.push({
+    //         timestamp: r.start, // Request start time
+    //         type: 'REQUEST',
+    //         action: 'Request Submitted',
+    //         user: r.netname || 'User',
+    //         netname: r.netname || 'unknown',
+    //         details: `Requested ${resourceName} from ${formatDateTime(r.start)} to ${formatDateTime(r.end)}`,
+    //         resource_name: resourceName,
+    //         resource_id: r.resource,
+    //         status: 'Pending',
+    //         reference: r.reference
+    //     });
+    // });
     
     // Sort by timestamp (most recent first)
     history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));

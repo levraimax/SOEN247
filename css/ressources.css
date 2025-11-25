@@ -64,24 +64,38 @@ ul {
             ul li a:hover {
                 background-color: #111111;
             }
-
+.class1{
+    text-align: center;
+    text-justify: auto;
+    font-size: 40px;
+    background-image:url("../img/background_image.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    color: black;
+    height: 25vh;
+}
 .contents {
     width: 70%;
     position: relative;
     left: 50%;
     transform: translate(-50%);
-    background-color: #d5eebd;
+    background-color: rgb(179, 219, 198);
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     align-content: flex-start;
     gap: 10%;
     padding:10px;
+    font-size: 20px;
 }
 
 .contents img { 
-    width:120px; 
-    height:120px;
+    width:200px; 
+    height:200px;
     object-fit:cover;
     margin:8px; 
     cursor:pointer; 
