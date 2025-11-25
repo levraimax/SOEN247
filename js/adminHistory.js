@@ -1,10 +1,69 @@
 document.addEventListener('DOMContentLoaded', function() {
+    displayHistory();
+});
 
 function displayHistory() {
     let contents = document.querySelector(".contents");
-    for (let log of history) {
-        if (!log.userOnly) contents.appendChild(document.createElement("p")).textContent = log.log;
+    
+    // Add safety check
+    if (!contents) {
+        console.error("Error: .contents element not found");
+        return;
     }
+    
+    contents.innerHTML = ""; // Clear existing content
+    
+    // Add title
+    let title = document.createElement("h2");
+    title.textContent = "System Activity History";
+    contents.appendChild(title);
+    
+    // Add filter options
+    let filterDiv = document.createElement("div");
+    filterDiv.className = "filter-section";
+    filterDiv.innerHTML = `
+        <label>Filter by action: 
+            <select id="actionFilter">
+                <option value="">All Actions</option>
+                <option value="BOOKING">Bookings</option>
+                <option value="AVAILABILITY">Availabilities</option>
+                <option value="REQUEST">Pending Requests</option>
+            </select>
+        </label>
+        <label>Filter by resource: 
+            <select id="resourceFilter">
+                <option value="">All Resources</option>
+            </select>
+        </label>
+    `;
+    contents.appendChild(filterDiv);
+    
+    // Create table
+    let table = document.createElement("table");
+    table.className = "history-table";
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>Date & Time</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Details</th>
+                <th>Resource</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="historyTableBody">
+            <tr><td colspan="6">Loading...</td></tr>
+        </tbody>
+    `;
+    contents.appendChild(table);
+    
+    // Fetch and display history
+    loadHistory();
+    
+    // Add event listeners for filters
+    document.getElementById("actionFilter").addEventListener("change", loadHistory);
+    document.getElementById("resourceFilter").addEventListener("change", loadHistory);
 }
 
 function loadHistory() {
