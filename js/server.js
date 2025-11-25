@@ -71,7 +71,7 @@ database.connect((err) => {
 });
 
 
-app.get("/signup", authenticate, (req, res) => {
+app.get("/signup", (req, res) => {
     //console.log(req.query);
     let { netname, firstName, lastName, email, role, password } = req.query;
     let params = [netname, firstName, lastName, email, (role == "admin") ? 1 : 0, password]
