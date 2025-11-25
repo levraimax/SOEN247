@@ -75,6 +75,11 @@ ul li a:hover {
     background-color: #111111;
 }
 
+.contents {
+    padding:50px;
+    padding-top:25px;
+}
+
 .contents img { 
     width:200px; 
     height:200px;
@@ -82,9 +87,9 @@ ul li a:hover {
     margin:8px; 
     cursor:pointer; 
     border: gray solid;
-    margin-left: 50px;
-    margin-top: 50px;
-    margin-bottom: 50px;
+    /*margin-left: 50px;*/
+    /*margin-top: 50px;*/
+    /*margin-bottom: 50px;*/
 }
 
 .modal {

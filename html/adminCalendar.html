@@ -5,7 +5,6 @@
     <meta charset="utf8" />
     <link rel="stylesheet" href="../css/adminCalendar.css" />
     <script src="../js/serverFunctions.js"></script>
-    <script src="../js/server.js"></script>
     <script src="../js/logout.js"></script>
 </head>
 <body onload="displayDays(); loadData()">
@@ -14,7 +13,7 @@
             <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
             <input type="button" onclick="showAlert()" id="logout" value="Log Out">
         </div>
-        </br>
+        <br/>
         <h1><b>CONCORDIA BOOKING WEBSITE</b></h1>
         <h2 style="color: red"><b>ADMIN MODE</b></h2>
         <!-- <p>by Arthur Panoyan, Samuel Charchar, Maxime Charest and George</p> -->
@@ -29,10 +28,10 @@
         <li><a href="adminReports.html">Statistics</a></li>
         <li><a href="adminHistory.html">History</a></li>
     </ul>
-    <div class="requestApproval hidden">
+    <!--<div class="requestApproval hidden">
         <button onclick="requestDecision(true)">Approve</button>
         <button onclick="requestDecision(false)">Decline</button>
-    </div>
+    </div>-->
 
     <div class="contents">
         <div class="calendar" onclick="toggleDayBook(event)">

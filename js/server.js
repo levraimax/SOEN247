@@ -3,9 +3,12 @@ const mysql = require("mysql")
 const cors = require("cors");
 const multer = require('multer');
 const upload = multer();
+const cookieParser = require("cookie-parser"); // Make sure you install it
+
 
 const app = express();
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({ origin: "http://localhost:8080", "credentials": true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -15,7 +18,38 @@ app.use((req, res, next) => {
     next();
 });
 
-let availabilities;
+let credentials = {};
+
+function generateKey(user) {
+    let res = Math.floor(Math.random() * 1E32);
+    credentials[res] = user;
+    return res;
+}
+
+function authenticate(req, res, next) {
+    const key = req.cookies.credentials;
+    if (key && credentials[key]) {
+        // Attach user info to request for downstream use
+        req.user = credentials[key];
+        next();
+    } else {
+        res.status(401).send("Unauthorized");
+    }
+}
+
+// Example: Protect an admin-only route
+function requireAdmin(req, res, next) {
+    // req.user is the user reference (from credentials)
+    const userRef = req.user;
+    const sql = `SELECT admin FROM users WHERE reference = ?`;
+    database.query(sql, [userRef], (err, result) => {
+        if (!err && result.length > 0 && result[0].admin) {
+            next();
+        } else {
+            res.status(403).send("Forbidden: Admins only");
+        }
+    });
+}
 
 const database = mysql.createConnection({
     host: "localhost"
@@ -37,7 +71,7 @@ database.connect((err) => {
 });
 
 
-app.get("/signup", (req, res) => {
+app.get("/signup", authenticate, (req, res) => {
     //console.log(req.query);
     let { netname, firstName, lastName, email, role, password } = req.query;
     let params = [netname, firstName, lastName, email, (role == "admin") ? 1 : 0, password]
@@ -63,6 +97,14 @@ app.get("/login", (req, res) => {
         database.query(sql, (err, result) => {
             if (!err && result.length > 0) {
                 console.log("admin", result[0].admin);
+
+                res.cookie("credentials", generateKey(result[0].reference), {
+                    maxAge: 3600E3,
+                    httpOnly: true, // The cookie will not be available to Console on browser through document.cookiessecure: false, // use true if using https
+                    secure: true
+                });
+
+
                 res.status(200).json([result[0].password == password, result[0].admin, result[0].reference]);
             } else {
                 res.status(200).send(false);
@@ -70,6 +112,19 @@ app.get("/login", (req, res) => {
         })
     }
 })
+
+
+app.get("/logout", authenticate, (req, res) => {
+    // Remove the credentials from the in-memory store
+    const key = req.cookies.credentials;
+    if (key) {
+        delete credentials[key];
+    }
+    // Clear the cookie (make sure to match the cookie options used in /login)
+    res.clearCookie("credentials");
+    res.status(200).send("Logged out");
+});
+
 
 
 //app.get("/signup/:id", (req, res) => {
@@ -87,8 +142,8 @@ app.get("/login", (req, res) => {
 //})
 
 
-app.get("/booksData", (req, res) => {
-    let { user } = req.query;
+app.get("/booksData", authenticate, (req, res) => {
+    let user = req.user;
 
     let sql = `SELECT * FROM bookings WHERE user = ?`
 
@@ -104,8 +159,8 @@ app.get("/booksData", (req, res) => {
 
 
 
-app.get("/requestsData", (req, res) => {
-    let { user } = req.query;
+app.get("/requestsData", authenticate, (req, res) => {
+    let user = req.user;
 
     let sql = `SELECT * FROM requests WHERE user = ?`
 
@@ -120,9 +175,9 @@ app.get("/requestsData", (req, res) => {
 
 })
 
-app.get("/userdata", (req, res) => {
-
-    let sql = `SELECT name, last_name, email, address, phone FROM users WHERE netname = '${req.query.netname}'`
+app.get("/userdata", authenticate, (req, res) => {
+    let user = req.user;
+    let sql = `SELECT name, last_name, email, address, phone FROM users WHERE reference = '${user}'`
     database.query(sql, (err, result) => {
         if (err) {
             res.status(500).send();
@@ -132,10 +187,10 @@ app.get("/userdata", (req, res) => {
     })
 })
 
-app.get("/submituserdata", (req, res) => {
+app.get("/submituserdata", authenticate, (req, res) => {
     let field = req.query.field;
     if (field != null && !field.includes(" ") && !field.toLowerCase().includes("netname")) {
-        let sql = `UPDATE users SET ${req.query.field} = '${req.query.value}' WHERE netname='${req.query.user}'`
+        let sql = `UPDATE users SET ${req.query.field} = '${req.query.value}' WHERE netname='${req.user}'`
         database.query(sql, (err) => {
             if (err) {
                 res.status(500).send("Failed to update user data");
@@ -149,7 +204,7 @@ app.get("/submituserdata", (req, res) => {
 })
 
 
-app.post("/createResource", upload.single('image'), (req, res) => {
+app.post("/createResource", authenticate, requireAdmin, upload.single('image'), (req, res) => {
     //console.log(req.file);
     if (req.body.name != null && req.body.description != null && req.body.location != null && req.body.capacity != null && req.body.capacity > 0) {
         let resource = req.body.name;
@@ -169,7 +224,7 @@ app.post("/createResource", upload.single('image'), (req, res) => {
     }
 })
 
-app.get("/resourceImage/:id", (req, res) => {
+app.get("/resourceImage/:id", authenticate, (req, res) => {
     //console.log(req.params.id);
     const sql = "SELECT image FROM resources WHERE reference = ?";
     database.query(sql, [req.params.id], (err, result) => {
@@ -187,17 +242,12 @@ function formatDateTime(dateTime) {
     return dateTime.replace("T", " ") + ":00";
 }
 
-app.get("/createAvailability", (req, res) => {
+app.get("/createAvailability", authenticate, requireAdmin, (req, res) => {
     //let resource = req.query.resource;
     //let start = req.query.start;
     //let end = req.query.end;
     //let auth = req.query.auth | 0;
     let { resource, start, end, auth } = req.query;
-
-    console.log(resource)
-    console.log(start)
-    console.log(end)
-    console.log(auth)
     //let capacity = req.query.capacity | 1;
 
     if (resource == null || start == null || end == null || auth == null) {
@@ -220,7 +270,7 @@ app.get("/createAvailability", (req, res) => {
 
 })
 
-app.get("/deleteAvailability", (req, res) => {
+app.get("/deleteAvailability", authenticate, requireAdmin, (req, res) => {
     let availability = req.query.reference;
     if (availability != null) {
         let sql = `DELETE FROM availabilities WHERE reference = ${availability}`
@@ -235,7 +285,7 @@ app.get("/deleteAvailability", (req, res) => {
     }
 })
 
-app.get("/updateAvailability", (req, res) => {
+app.get("/updateAvailability", authenticate, requireAdmin, (req, res) => {
     let { reference, resource, start, end, auth } = req.query;
 
     if (reference == null || resource == null | start == null || end == null || auth == null) {
@@ -254,7 +304,7 @@ app.get("/updateAvailability", (req, res) => {
     }
 })
 
-app.get("/updateResource", (req, res) => {
+app.get("/updateResource", authenticate, requireAdmin, (req, res) => {
     console.log("Updating resource.. implement checking credentials")
     //console.log(req.query);
     //name description, location, capacity
@@ -283,7 +333,7 @@ app.get("/updateResource", (req, res) => {
 
 })
 
-app.get("/deleteResource", (req, res) => {
+app.get("/deleteResource", authenticate, requireAdmin, (req, res) => {
     console.log("Deleting resource.. implement checking credentials (ADMIN ONLY)")
     let resource = req.query.reference;
     let sql = `DELETE FROM resources WHERE reference = ${resource}`
@@ -296,20 +346,51 @@ app.get("/deleteResource", (req, res) => {
     })
 })
 
-app.get("/deleteRequest", (req, res) => {
+app.get("/deleteRequest", authenticate, (req, res) => {
     console.log("Deleting request.. implement checking credentials (ADMIN ONLY)")
     let { reference } = req.query;
-    let sql = `DELETE FROM requests WHERE reference = ${reference}`
-    database.query(sql, (err) => {
-        if (err) {
-            res.status(404).send();
+
+    function deleteRequest() {
+        let sql = `DELETE FROM requests WHERE reference = ${reference}`
+        database.query(sql, (err) => {
+            if (err) {
+                res.status(404).send();
+            } else {
+                res.status(200).send();
+            }
+        })
+    }
+
+    let sql = `SELECT admin FROM users WHERE reference = ?`;
+    database.query(sql, [req.user], (err, result) => {
+        if (!err && result.length > 0 && result[0].admin) {
+            // The user is an admin
+            deleteRequest();
+            //res.status(200).send();
         } else {
-            res.status(200).send();
+            // Not admin; are they the creator of the request?
+            let sql = "SELECT user FROM availabilities WHERE reference = ?"
+            database.query(sql, [reference], (err, result) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send();
+                } else {
+                    let reqUser = result[0].user;
+                    if (reqUser == req.user) {
+                        // Allowed to delete
+                        deleteRequest();
+                        //res.status(200).send();
+                    } else {
+                        // Not allowed
+                        res.status(403).send();
+                    }
+                }
+            })
         }
-    })
+    });
 })
 
-app.get("/approveRequest", (req, res) => {
+app.get("/approveRequest", authenticate, requireAdmin, (req, res) => {
     console.log("Approving request.. implement checking credentials (ADMIN ONLY)")
     // 1. All that matters is the request reference
     let { request } = req.query;
@@ -321,7 +402,7 @@ app.get("/approveRequest", (req, res) => {
             res.status(500).send();
         } else {
             // 3. Is the availability null (custom)
-            result=result[0]
+            result = result[0]
             if (result.availability == null) {
                 // Yes: make an availability and book that availability
                 let sql = `INSERT INTO availabilities (resource,start,end,auth) VALUES (?,?,?,1)`
@@ -376,24 +457,53 @@ app.get("/approveRequest", (req, res) => {
             }
         }
     })
-    
+
 })
 
-app.get("/deleteBooking", (req, res) => {
+app.get("/deleteBooking", authenticate, requireAdmin, (req, res) => {
     console.log("Deleting booking.. implement checking credentials (USER ONLY)")
     console.log("Deleting booking.. IMPLEMENT CAPACITY")
     let { reference } = req.query;
-    let sql = `DELETE FROM bookings WHERE reference = ${reference}`
-    database.query(sql, (err) => {
-        if (err) {
-            res.status(404).send();
+
+    function deleteBooking() {
+        let sql = `DELETE FROM bookings WHERE reference = ${reference}`
+        database.query(sql, (err) => {
+            if (err) {
+                res.status(404).send();
+            } else {
+                res.status(200).send();
+            }
+        })
+    }
+
+    let sql = `SELECT admin FROM users WHERE reference = ?`;
+    database.query(sql, [req.user], (err, result) => {
+        if (!err && result.length > 0 && result[0].admin) {
+            // The user is an admin
+            deleteBooking();
         } else {
-            res.status(200).send();
+            // Not admin; are they the creator of the request?
+            let sql = "SELECT user FROM bookings WHERE reference = ?"
+            database.query(sql, [reference], (err, result) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send();
+                } else {
+                    let reqUser = result[0].user;
+                    if (reqUser == req.user) {
+                        // Allowed to delete
+                        deleteBooking();
+                    } else {
+                        // Not allowed
+                        res.status(403).send();
+                    }
+                }
+            })
         }
-    })
+    });
 })
 
-app.get("/resources", (req, res) => {
+app.get("/resources",authenticate, (req, res) => {
     let sql = "SELECT reference,name,description,location,capacity,blocked FROM resources";
     database.query(sql, (err, result) => {
         if (err) {
@@ -404,7 +514,7 @@ app.get("/resources", (req, res) => {
     })
 })
 
-app.get("/availabilities", (req, res) => {
+app.get("/availabilities", authenticate,(req, res) => {
     let sql = "SELECT * FROM availabilities";
     database.query(sql, (err, result) => {
         if (err) {
@@ -415,7 +525,7 @@ app.get("/availabilities", (req, res) => {
     })
 })
 
-app.get("/requests", (req, res) => {
+app.get("/requests",authenticate, requireAdmin, (req, res) => {
     console.log("Obtaining requests.. implement checking credentials (ADMIN ONLY)")
     let sql = "SELECT requests.*, users.netname, resources.name FROM requests INNER JOIN users ON requests.user = users.reference INNER JOIN resources ON requests.resource = resources.reference";
     database.query(sql, (err, result) => {
@@ -430,7 +540,7 @@ app.get("/requests", (req, res) => {
 
 
 // Reports endpoint: return booking counts per resource
-app.get("/reports/resourceCounts", (req, res) => {
+app.get("/reports/resourceCounts", authenticate,(req, res) => {
     const sql = `
         SELECT r.reference, r.name, COUNT(b.reference) AS bookings
         FROM resources r
@@ -453,7 +563,7 @@ app.get("/reports/resourceCounts", (req, res) => {
 
 
 // Reports endpoint: return booking counts grouped by hour (e.g. '09:00')
-app.get('/reports/timeCounts', (req, res) => {
+app.get('/reports/timeCounts',authenticate, (req, res) => {
     const sql = `
         SELECT DATE_FORMAT(a.start, '%H:00') AS hour_label, COUNT(b.reference) AS bookings
         FROM availabilities a
@@ -505,9 +615,10 @@ app.get('/reports/timeCounts', (req, res) => {
 //        }
 //    }
 //})
-app.get("/request", (req, res) => {
-    let { user, reference, start, end } = req.query
-    console.log(start,end)
+app.get("/request", authenticate,(req, res) => {
+    let { reference, start, end } = req.query
+    let user = req.user;
+    console.log(start, end)
     if (reference != null) {
         if (user == null) {
             res.status(500).send()
@@ -633,7 +744,7 @@ function bookAvailability(availability, user, range = null) {
     }
 }
 
-app.get("/updateRequest", (req, res) => {
+app.get("/updateRequest", authenticate, (req, res) => {
     console.log("Updating request.. implement checking credentials");
     let { reference, start, end, resource } = req.query;
 

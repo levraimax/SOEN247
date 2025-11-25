@@ -90,6 +90,7 @@ float: left;
     align-content: flex-start;
     font-size: 25px;
     margin-top: 8px;
+    overflow-y:auto;
 }
 
 .chart-container{

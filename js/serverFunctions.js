@@ -62,6 +62,7 @@ function sendQuery(form, url, callback) {
 
 function GET(url, callback) {
     var xmlHttp = new XMLHttpRequest();
+    xmlHttp.withCredentials = true;
     xmlHttp.onreadystatechange = callback;
     xmlHttp.open("GET", url, true);
     xmlHttp.send();
@@ -69,6 +70,7 @@ function GET(url, callback) {
 
 function GET_SYNC(url) {
     var xmlHttp = new XMLHttpRequest();
+    xmlHttp.withCredentials = true;
     xmlHttp.open("GET", url, false);
     xmlHttp.send()
 
@@ -199,13 +201,16 @@ function updateRequest(data, callback = None) {
 }
 
 function appendHistory(text, admin = false, userOnly = null) {
-    if (!userOnly) history.push({ "log": `(${(new Date()).toLocaleString()}) ${text}`, "admin": admin, "user": user })
-    if (userOnly != null) history.push({ "log": `(${(new Date()).toLocaleString()}) ${text}`, "admin": false, "user": userOnly, userOnly: true })
-    save("history");
+
+    //if (!userOnly) history.push({ "log": `(${(new Date()).toLocaleString()}) ${text}`, "admin": admin, "user": user })
+    //if (userOnly != null) history.push({ "log": `(${(new Date()).toLocaleString()}) ${text}`, "admin": false, "user": userOnly, userOnly: true })
+    //save("history");
 }
 
 
 function save(name) {
+    alert("LOCAL STORAGE SAVING IS OBSOLETE")
+    console.log("LOCAL STORAGE SAVING IS OBSOLETE")
     switch (name) {
         case "serverData":
             localStorage.setItem("serverData", JSON.stringify(serverData));
