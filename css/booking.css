@@ -22,7 +22,11 @@ header {
     margin-right: 0;
     border: 1px solid #a8b3ac;
     display: block;
+    padding: 10px 20px;
+    
+
 }
+
 
 .buttons {
     display: flex;
@@ -76,23 +80,27 @@ ul {
             }
 
 .contents {
-    height: 100%;
+    height: calc(100% - 120px); /* basic space for header + nav */
+    max-width: 1100px;
     width: 100%;
-    position: relative;
-    left: 50%;
-    transform: translate(-50%);
-    /*background-color: yellow;*/
+    margin: 20px auto;
     display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    align-content: flex-start;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 10px;
 }
+
 
 .sidebar {
     width: 15%;
     height: 100%;
     display: flex;
     flex-direction: column;
+    background-color: #f0f4f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+
 }
 
 
@@ -116,6 +124,7 @@ ul {
     width: 70%;
     height: 100%;
     background-color: green;
+    
 }
 
 .booking, .pending {
