@@ -1,12 +1,18 @@
 // ressources.js
 
+//function loadResources() {
+//    const data = localStorage.getItem("resources");
+//    return data ? JSON.parse(data) : [];
+//}
+
+let resources;
+
 function loadResources() {
-    const data = localStorage.getItem("resources");
-    return data ? JSON.parse(data) : [];
+    resources = GET_SYNC("http://localhost:3000/resources")
 }
 
 function addAllResources() {
-    const resources = loadResources();
+    //const resources = loadResources();
     const contentsDiv = document.querySelector(".contents");
     contentsDiv.innerHTML = "";
 
@@ -19,7 +25,8 @@ function addAllResources() {
         }
 
         const img = document.createElement("img");
-        img.src = res.img || "../img/default.png";
+        //img.src = res.img || "../img/default.png";
+        img.src = "http://localhost:3000/resourceImage/" + res.reference;
         img.alt = res.name;
         img.className = "resource-img";
 
@@ -50,7 +57,7 @@ function addAllResources() {
     });
 }
 
-// Initialize page
-document.addEventListener("DOMContentLoaded", () => {
-    addAllResources();
-});
+//// Initialize page
+//document.addEventListener("DOMContentLoaded", () => {
+//    addAllResources();
+//});
