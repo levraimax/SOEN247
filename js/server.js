@@ -27,7 +27,7 @@ function generateKey(user) {
 }
 
 function authenticate(req, res, next) {
-    console.log(credentials)
+    //console.log(credentials)
     const key = req.cookies.credentials;
     if (key && credentials[key]) {
         // Attach user info to request for downstream use
@@ -400,7 +400,7 @@ app.get("/deleteRequest", authenticate, (req, res) => {
             //res.status(200).send();
         } else {
             // Not admin; are they the creator of the request?
-            let sql = "SELECT user FROM availabilities WHERE reference = ?"
+            let sql = "SELECT user FROM requests WHERE reference = ?"
             database.query(sql, [reference], (err, result) => {
                 if (err) {
                     console.log(err);
@@ -649,7 +649,7 @@ app.get('/reports/timeCounts', authenticate, (req, res) => {
 app.get("/request", authenticate, (req, res) => {
     let { reference, start, end } = req.query
     let user = req.user;
-    console.log(start, end)
+    //console.log(start, end)
     if (reference != null) {
         if (user == null) {
             res.status(500).send()
@@ -664,7 +664,7 @@ app.get("/request", authenticate, (req, res) => {
                     console.log(err)
                     res.status(500).send()
                 } else {
-                    console.log(result)
+                    //console.log(result)
                     let aStart = result[0].start;
                     let aEnd = result[0].end;
 
@@ -719,7 +719,7 @@ app.get("/request", authenticate, (req, res) => {
         }
     } else {
         // Create a new custom request
-        let { resource } = req.query
+        let { resource } = req.query;
         if (resource == null) {
             res.status(500).send();
         } else {
@@ -728,6 +728,52 @@ app.get("/request", authenticate, (req, res) => {
         }
     }
 })
+
+
+function availabilityHasRoom(availability, callback) {
+    let sql = `
+        SELECT 
+            r.capacity, 
+            COUNT(b.reference) AS count
+        FROM availabilities a
+        INNER JOIN resources r ON a.resource = r.reference
+        LEFT JOIN bookings b ON b.availability = a.reference
+        WHERE a.reference = ?
+    `;
+
+    database.query(sql, [availability], (err, result) => {
+        if (err) {
+            callback(false)
+        } else {
+            callback(result[0].count < result[0].capacity);
+        }
+    })
+}
+
+function hasRoom(resource, start, end, callback) {
+    // Overlap: start < end && end > start
+    //console.log(resource, start, end)
+    //console.log(start,end)
+    let sql = `SELECT COUNT(b.reference) AS count, r.capacity FROM resources r 
+    LEFT JOIN availabilities a ON a.resource = r.reference
+    LEFT JOIN bookings b ON b.availability = a.reference
+    WHERE r.reference = ?
+        AND b.end > ?
+        AND b.start < ?`;
+
+    database.query(sql, [resource, start, end], (err, result) => {
+        //console.log("HERE", result)
+        //console.log(result[0].count)
+        //console.log(result[0].capacity)
+        //console.log(result[0].count < result[0].capacity)
+        if (err) {
+            callback(false)
+        } else if (callback) {
+            callback(result[0].count < result[0].capacity);
+        }
+    })
+}
+
 
 // Making a request, assuming the availabiltiy exists
 function createRequest(availability, user, range = null) {
@@ -759,20 +805,68 @@ function customRequest(user, resource, start, end) {
 
 function bookAvailability(availability, user, range = null) {
     console.log("BOOK AVAILABILITY")
-    if (range) {
-        // Specific range
-        let sql = `INSERT INTO bookings (availability,user,start,end) VALUES (?,?,?,?)`
-        let [start, end] = range;
-        database.query(sql, [availability, user, start, end], (err) => {
-            if (err) console.log(err);
-        })
-    } else {
-        // Full range
-        let sql = `INSERT INTO bookings (availability, user, start, end) SELECT ?, ?, start, end FROM availabilities WHERE reference = ?`
-        database.query(sql, [availability, user, availability], (err) => {
-            if (err) console.log(err)
-        })
-    }
+
+    let sql = `SELECT resource FROM availabilities WHERE reference = ?`
+    database.query(sql, [availability], (err, result) => {
+        if (err) {
+            console.log(err)
+        } else {
+            let resource = result[0].resource;
+            //if (hasRoom(resource, range)) {
+            if (range) {
+                // Specific range
+                let [start, end] = range;
+                hasRoom(resource, start, end, (room) => {
+                    //console.log()
+                    if (room) {
+                        let sql = `INSERT INTO bookings (availability,user,start,end) VALUES (?,?,?,?)`
+
+                        database.query(sql, [availability, user, start, end], (err) => {
+                            if (err) console.log(err);
+                        })
+                    } else {
+                        console.log("Resource request: No more room")
+                    }
+                });
+            } else {
+                // Full range
+                //if (availabilityHasRoom(availability), (room) => {}) {
+                //    let sql = `INSERT INTO bookings (availability, user, start, end) SELECT ?, ?, start, end FROM availabilities WHERE reference = ?`
+                //    database.query(sql, [availability, user, availability], (err) => {
+                //        if (err) console.log(err)
+                //    })
+                //} else {
+                //    console.log("Availability request: No more room")
+                //}
+                availabilityHasRoom(availability, (room) => {
+                    if (room) {
+                        let sql = `INSERT INTO bookings (availability, user, start, end) SELECT ?, ?, start, end FROM availabilities WHERE reference = ?`
+                        database.query(sql, [availability, user, availability], (err) => {
+                            if (err) console.log(err)
+                        })
+                    } else {
+                        console.log("Availability request: No more room")
+                    }
+                })
+            }
+            //}
+        }
+    })
+
+    //if (range) {
+    //    // Specific range
+    //    let sql = `INSERT INTO bookings (availability,user,start,end) VALUES (?,?,?,?)`
+    //    let [start, end] = range;
+    //    database.query(sql, [availability, user, start, end], (err) => {
+    //        if (err) console.log(err);
+    //    })
+    //} else {
+    //    // Full range
+    //    let sql = `INSERT INTO bookings (availability, user, start, end) SELECT ?, ?, start, end FROM availabilities WHERE reference = ?`
+    //    database.query(sql, [availability, user, availability], (err) => {
+    //        if (err) console.log(err)
+    //    })
+    //}
 }
 
 app.get("/updateRequest", authenticate, (req, res) => {
