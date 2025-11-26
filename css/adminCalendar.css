@@ -57,13 +57,14 @@ header h1{
 
 ul {
     list-style-type: none;
+    margin: 0;
     padding: 0;
     overflow: hidden;
-    display:flex;
-    padding-left: 10%;
-    gap:20px;
     background-color: #333333;
-    font-size: 18px;
+    display: flex;
+    gap: 20px;
+    padding-left:10%;
+    font-size:18px;
 }
 
 ul li {
