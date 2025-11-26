@@ -22,10 +22,12 @@ header {
     display: block;
     padding-left: 10%;
 }
+
 header h1{
     font-size: 35px;
     font-family: Lato, sans-serif;
 }
+
 .buttons {
     display: flex;
     justify-content: flex-end;
@@ -55,14 +57,13 @@ header h1{
 
 ul {
     list-style-type: none;
-    margin: 0;
     padding: 0;
     overflow: hidden;
+    display:flex;
+    padding-left: 10%;
+    gap:20px;
     background-color: #333333;
-    display: flex;
-    gap: 20px;
-    padding-left:10%;
-    font-size:18px;
+    font-size: 18px;
 }
 
 ul li {
@@ -82,8 +83,8 @@ ul li a:hover {
 }
 
 .contents {
-    margin-top:5px;
-    width: 70%;
+    height: 100%;
+    width: 85%;
     position: relative;
     left: 50%;
     transform: translate(-50%);
@@ -92,12 +93,11 @@ ul li a:hover {
     flex-wrap: wrap;
     flex-direction: column;
     align-content: flex-start;
-    font-size: 22px;
+    font-size: 25px;
     font-family: 'Times New Roman', Times, serif;
 }
 
 footer{
-    text-align: center;
-    margin-top:12%; 
+    text-align: center; 
 
 }
