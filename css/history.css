@@ -17,13 +17,15 @@ body {
 }
 
 header {
-    background-color: #a8b3ac;
-    margin-left: 0;
-    margin-right: 0;
+     background-color: #a8b3ac;
     border: 1px solid #a8b3ac;
     display: block;
+    padding-left: 10%;
 }
-
+header h1{
+    font-size: 35px;
+    font-family: Lato, sans-serif;
+}
 .buttons {
     display: flex;
     justify-content: flex-end;
@@ -53,14 +55,18 @@ header {
 
 ul {
     list-style-type: none;
-    margin: 0;
     padding: 0;
     overflow: hidden;
+    display:flex;
+    padding-left: 10%;
+    gap:20px;
     background-color: #333333;
+    font-size: 18px;
 }
 
     ul li {
-        float: left;
+        float: none;
+        display: inline-block;
     }
 
         ul li a {

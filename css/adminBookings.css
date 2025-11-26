@@ -18,13 +18,14 @@ body {
 
 header {
     background-color: #a8b3ac;
-    margin-left: 10%;
-    margin-right: 10%;
     border: 1px solid #a8b3ac;
     display: block;
-    padding-left: 10px;
+    padding-left: 10%;
 }
-
+header h1{
+    font-size: 40px;
+    font-family: Lato, sans-serif;
+}
 .buttons {
     display: flex;
     justify-content: flex-end;
@@ -58,12 +59,15 @@ ul {
     padding: 0;
     overflow: hidden;
     background-color: #333333;
-    margin-right:10%;
-    margin-left:10%;
+    display: flex;
+    gap: 20px;
+    padding-left:10%;
+    font-size:18px;
 }
 
     ul li {
-        float: left;
+        float: none;
+        display: inline-block;
     }
 
         ul li a {

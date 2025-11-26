@@ -18,10 +18,14 @@ body {
 
 header {
     background-color: #a8b3ac;
-    margin-left: 0;
-    margin-right: 0;
     border: 1px solid #a8b3ac;
     display: block;
+    padding-left: 10%;
+}
+
+header h1{
+    font-size: 35px;
+    font-family: Lato, sans-serif;
 }
 
 .buttons {
@@ -53,15 +57,17 @@ header {
 
 ul {
     list-style-type: none;
-    padding-left: 5px;
+    padding: 0;
     overflow: hidden;
+    display:flex;
+    padding-left: 10%;
+    gap:20px;
     background-color: #333333;
-    margin-right:10%;
-    margin-left:10%;
+    font-size: 18px;
 }
 
 ul li {
-    float: left;
+    float: none;
 }
 
 ul li a {
