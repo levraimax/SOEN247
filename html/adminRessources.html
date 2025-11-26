@@ -11,7 +11,7 @@
 <body>
     <header>
         <div class="buttons">
-            <a href="profile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
+            <a href="adminProfile.html"><img src="../img/profileIcon.png" alt="Profile Icon" width="30" height="30"></a>
             <input type="button" onclick="showAlert()" id="logout" value="Log Out">
         </div>
         <br />
@@ -21,13 +21,15 @@
 
     <ul>
         <li><a href="adminLoged_in.html">Home</a></li>
-        <li><a href="adminRessources.html">List of Ressources</a></li>
+        <li><a href="adminRessources.html"style="background-color:rgba(27, 21, 21, 0.726) ;" >List of Ressources</a></li>
         <li><a href="adminBookings.html">Bookings</a></li>
         <li><a href='adminCalendar.html'>Calendar</a></li>
         <li><a href="adminReports.html">Statistics</a></li>
         <li><a href="adminHistory.html">History</a></li>
     </ul>
-
+    <div class=" class1">
+        <h2>SERVICES & RESOURCES</h2>
+    </div>
     <div class="contents">
         <img src="../img/adding.png" id="create" alt="Create resource">
     </div>
@@ -50,7 +52,7 @@
     </form>
 
     <form id="creationForm" onsubmit="return false;">
-        <div id="createModal" class="modal" aria-hidden="true">
+        <div id="createModal" class="modal">
             <h3>Create Resource</h3>
             <label>Name: <input type="text" id="createResName" name="name"></label><br><br>
             <label>Description:</label><br>

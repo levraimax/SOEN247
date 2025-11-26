@@ -18,10 +18,11 @@ body {
 
 header {
     background-color: #a8b3ac;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 10%;
+    margin-right: 10%;
     border: 1px solid #a8b3ac;
     display: block;
+    padding-left: 10px;
 }
 
 .buttons {
@@ -57,6 +58,8 @@ ul {
     padding: 0;
     overflow: hidden;
     background-color: #333333;
+    margin-left:10%;
+    margin-right: 10%;
 }
 
     ul li {
@@ -74,7 +77,28 @@ ul {
             ul li a:hover {
                 background-color: #111111;
             }
-
+        
+.contents{
+    margin-right:10%;
+    margin-left:10%;
+}
+.contents h2{
+    text-align: center;
+    text-justify: auto;
+    font-size:60px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    color: white;
+    height: 20vh;
+    background-image: url("../img/backgroundHistory.png");
+    margin-top:5px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px black;
+}
 .filter-section {
     margin: 20px 0;
     padding: 15px;

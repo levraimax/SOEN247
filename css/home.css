@@ -18,10 +18,11 @@ body {
 
 header {
     background-color: #a8b3ac;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 10%;
+    margin-right: 10%;
     border: 1px solid #a8b3ac;
     display: block;
+    padding-left:10px;
 }
 
 .buttons {
@@ -53,30 +54,31 @@ header {
 
 ul {
     list-style-type: none;
-    margin: 0;
     padding: 0;
     overflow: hidden;
     background-color: #333333;
+    margin-right:10%;
+    margin-left:10%;
 }
 
-    ul li {
-        float: left;
-    }
+ul li {
+float: left;
+}
 
-        ul li a {
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
+ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
 
-            ul li a:hover {
-                background-color: #111111;
-            }
+ul li a:hover {
+    background-color: #111111;
+}
 
 .contents {
-    height: 100%;
+    margin-top:5px;
     width: 70%;
     position: relative;
     left: 50%;
@@ -91,6 +93,7 @@ ul {
 }
 
 footer{
-    text-align: center; 
+    text-align: center;
+    margin-top:12%; 
 
 }

@@ -18,10 +18,11 @@ body {
 
 header {
     background-color: #a8b3ac;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 10%;
+    margin-right: 10%;
     border: 1px solid #a8b3ac;
     display: block;
+    padding-left:10px;
 }
 
 .buttons {
@@ -53,10 +54,11 @@ header {
 
 ul {
     list-style-type: none;
-    margin: 0;
     padding: 0;
     overflow: hidden;
     background-color: #333333;
+    margin-right:10%;
+    margin-left:10%;
 }
 
 ul li {
@@ -75,21 +77,38 @@ ul li a:hover {
     background-color: #111111;
 }
 
+.class1{
+    text-align: center;
+    text-justify: auto;
+    font-size: 40px;
+    background-image:url("../img/background_image.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    color: black;
+    height: 20vh;
+    margin-top: 5px;
+    margin-left:10%;
+    margin-right:10%;
+}
+
 .contents {
     padding:50px;
     padding-top:25px;
+    margin-left:8%;
+    margin-right:8%;
 }
 
 .contents img { 
     width:200px; 
     height:200px;
     object-fit:cover;
-    margin:8px; 
+    margin:10px; 
     cursor:pointer; 
     border: gray solid;
-    /*margin-left: 50px;*/
-    /*margin-top: 50px;*/
-    /*margin-bottom: 50px;*/
 }
 
 .modal {

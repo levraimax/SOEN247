@@ -18,10 +18,11 @@ body {
 
 header {
     background-color: #a8b3ac;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 10%;
+    margin-right: 10%;
     border: 1px solid #a8b3ac;
     display: block;
+    padding-left: 10px;
 }
 
 .buttons {
@@ -57,6 +58,8 @@ ul {
     padding: 0;
     overflow: hidden;
     background-color: #333333;
+    margin-right:10%;
+    margin-left:10%;
 }
 
     ul li {
@@ -74,6 +77,12 @@ ul {
             ul li a:hover {
                 background-color: #111111;
             }
+            
+.class1 h2{
+    margin-left:10%;
+    margin-right:10%;
+    font-family: Arial, sans-serif;
+}
 
 .contents {
     height: calc(100% - 140px); 

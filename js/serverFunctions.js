@@ -74,8 +74,17 @@ function GET_SYNC(url) {
     xmlHttp.open("GET", url, false);
     xmlHttp.send()
 
-    if (xmlHttp.response) {
-        return JSON.parse(xmlHttp.response);
+    // Only parse if status is 200 and response exists
+    if (xmlHttp.status === 200 && xmlHttp.response) {
+        try {
+            return JSON.parse(xmlHttp.response);
+        } catch (e) {
+            console.error('GET_SYNC: Failed to parse JSON from ' + url, e);
+            return null;
+        }
+    } else if (xmlHttp.status !== 200) {
+        console.warn('GET_SYNC: HTTP ' + xmlHttp.status + ' from ' + url + ': ' + xmlHttp.response);
+        return null;
     }
     return null;
 }
@@ -106,7 +115,8 @@ function sendResource(form) {
 
     return fetch("http://localhost:3000/createResource", {
         method: "POST",
-        body: fd
+        body: fd,
+        credentials: "include"  // Include authentication cookie
     })
 }
 

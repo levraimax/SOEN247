@@ -80,6 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         contentsDiv.appendChild(createBtn);
 
+        // Handle error if resources is null (auth error or network issue)
+        if (!resources) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.color = 'red';
+            errorDiv.style.padding = '10px';
+            errorDiv.textContent = 'Failed to load resources. Please check if you are logged in as admin.';
+            contentsDiv.appendChild(errorDiv);
+            return;
+        }
+
         //resources.forEach(res => {
         //    console.log(res)
         //    const img = document.createElement('img');
@@ -359,5 +369,16 @@ function submitEdit(renderAllResources) {
 }
 
 function processCreation(form) {
-    return sendResource(form)
+    return sendResource(form).then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server error: ${response.status} - ${text}`);
+            });
+        }
+        return response.json();
+    }).catch(error => {
+        console.error('Error creating resource:', error);
+        alert('Failed to create resource. Check console and admin permissions.');
+        throw error;
+    });
 }
