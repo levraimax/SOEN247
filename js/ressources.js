@@ -1,10 +1,5 @@
 // ressources.js
 
-//function loadResources() {
-//    const data = localStorage.getItem("resources");
-//    return data ? JSON.parse(data) : [];
-//}
-
 let resources;
 
 function loadResources() {
@@ -57,7 +52,3 @@ function addAllResources() {
     });
 }
 
-//// Initialize page
-//document.addEventListener("DOMContentLoaded", () => {
-//    addAllResources();
-//});

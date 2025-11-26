@@ -108,33 +108,7 @@ function requestDecision(decision) {
 
     loadRequests();
     displayRequests();
-    ////let reqData = JSON.parse(localStorage.getItem("requests"));
-    //remove(requests, requestTarget.data);
-
-    ////let serverData = JSON.parse(localStorage.getItem("serverData"));
-    //remove(serverData[requestTarget.data.user]["pending"], requestTarget.data);
-    //let temp = requestTarget.data.user;
-
-    //if (decision) {
-    //    //let serverData = JSON.parse(localStorage.getItem("serverData"));
-    //    // Remove the user from the req.data
-    //    cancel(requestTarget.data);
-
-    //    delete requestTarget.data["user"];
-    //    serverData[temp]["bookings"].push(requestTarget.data);
-    //}
-
-    //appendHistory(`${user} ${decision ? "approved" : "denied"} booking request: ${requestTarget.data.resource} at ${requestTarget.data.time} on ${requestTarget.data.date} from ${temp}`, true);
-    //appendHistory(`Booking request for ${requestTarget.data.resource} at ${requestTarget.data.time} on ${requestTarget.data.date} was ${decision ? "approved" : "denied"}.`, false, temp)
-    ////appendHistory()
-
-    //requestTarget = null;
-    ////localStorage.setItem("serverData", JSON.stringify(serverData));
-    ////localStorage.setItem("requests", JSON.stringify(reqData));
-    //save("serverData")
-    //save("requests")
-
-    //displayRequests();
+    
     displayApproval(null, false);
 }
 
@@ -169,65 +143,14 @@ function createBooking(event) {
     //return;
     GET_SYNC("http://localhost:3000/createAvailability?" + fd.toString())
     loadListings();
-    //return;
-    //let dateValue = end.value.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3/$2/$1");
-    //let authValue = auth.checked;
-
-    ////let serverListings = JSON.parse(localStorage.getItem("listings"));
-    //let data = { "resource": resource.value, "time": start.value, "date": dateValue, auth: authValue };
-    //listings.push(data)
-    ////localStorage.setItem("listings", JSON.stringify(serverListings));
-    //save("listings");
-
-    ////let availabilities = JSON.parse(localStorage.getItem("availabilities"));
-    //if (availabilities[dateValue] == undefined) availabilities[dateValue] = {};
-    //if (availabilities[dateValue][start.value] == undefined) availabilities[dateValue][start.value] = [];
-    //availabilities[dateValue][start.value].push(data);
-    ////localStorage.setItem("availabilities", JSON.stringify(availabilities));
-    //save("availabilities");
-
-    //appendHistory(`${user} made ${data.resource} available at ${data.time} on ${data.date}`, true);
+    
 
     clear();
     displayBookings();
     return false;
 }
 
-//function indexOfReq(arr, req) {
-//    for (let i in arr) {
-//        let r = arr[i];
-//        if (r.resource === req.resource &&
-//            r.time === req.time &&
-//            r.date === req.date &&
-//            r.user == req.user) {
-//            return arr.indexOf(r);
-//        }
-//    }
-//    return -1;
-//}
 
-//function indexOfBook(arr, book) {
-//    for (let i in arr) {
-//        let b = arr[i];
-//        if (b.resource === book.resource &&
-//            b.time === book.time &&
-//            b.date === book.date &&
-//            b.auth == book.auth) {
-//            return arr.indexOf(b);
-//        }
-//    }
-//    return -1;
-//}
-
-
-//function removeReq(arr, req) {
-//    let x = indexOfReq(arr, req);
-//    if (x != -1) arr.splice(x, 1);
-//}
-//function remove(arr, target) {
-//    let x = indexOfBook(arr, target);
-//    if (x != -1) arr.splice(x, 1);
-//}
 
 function buttonModifyClick(button) {
     switch (button.textContent) {
@@ -240,29 +163,10 @@ function buttonModifyClick(button) {
             let fd = new URLSearchParams(res);
             GET_SYNC("http://localhost:3000/updateAvailability?" + fd.toString())
             loadListings();
-            //return;
-            //// Listing
-            ////let listings = JSON.parse(localStorage.getItem("listings"));
-            //listings[indexOfBook(listings, toModify.data)] = res;
-            //// Availabilities
-            ////let availabilities = JSON.parse(localStorage.getItem("availabilities"));
-
-            //if (toModify.data.date == res.date && toModify.data.time == res.time) {
-            //    availabilities[res.date][res.time][indexOfBook(availabilities[res.date][res.time], toModify.data)] = res;
-            //} else {
-            //    remove(availabilities[toModify.data.date][toModify.data.time], toModify.data);
-            //    if (availabilities[res.date] == undefined) availabilities[res.date] = {};
-            //    if (availabilities[res.date][res.time] == undefined) availabilities[res.date][res.time] = [];
-            //    availabilities[res.date][res.time].push(res);
-            //}
-            //appendHistory(`${user} modified booking: ${toModify.data.resource} at ${toModify.data.time} on ${toModify.data.date} to ${res.resource} at ${res.time} on ${res.date}`, true);
+            
             toModify.data = res;
 
-            //localStorage.setItem("listings", JSON.stringify(listings));
-            //localStorage.setItem("availabilities", JSON.stringify(availabilities));
-            //save("listings");
-            //save("availabilities");
-
+ 
             document.getElementById("submit").classList.remove("hidden");
             document.querySelectorAll(".creation button").forEach(btn => btn.classList.add("hidden"));
             clear()
@@ -299,36 +203,21 @@ function buttonClick(button) {
 
     switch (button.textContent) {
         case "Modify":
-            //alert(button.textContent + ", " + data.resource + " " + data.time + " " + data.date);
             resource.value = data.resource_name;
-            //time.value = data.time;
 
 
             start.value = formattedDate(data.start)
             end.value = formattedDate(data.end);
-            //date.value = data.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1");
             auth.checked = data.auth;
 
 
             document.getElementById("submit").classList.add("hidden");
             document.querySelectorAll(".creation button").forEach(btn => btn.classList.remove("hidden"));
-            //Modifying allows to modify the contents
-            // -Resource
-            // -Time
-            // -Date
-            //Validity is displayed to the user with color
-            //When valid, the user can click the save button (new value of the Modify button), or
-            //the Back button to discard changes (revert function of some sorts).
+
 
             break;
         case "Cancel":
-            ////let serverListings = JSON.parse(localStorage.getItem("listings"));
-            //appendHistory(`${user} removed listing: ${data.resource} at ${data.time} on ${data.date}`, true);
-            //cancel(data);
-            ////remove(listings, data)
-            ////remove(availabilities[data.date][data.time], data);
-            ////save("listings");
-            ////save("availabilities");
+
 
             GET_SYNC(`http://localhost:3000/deleteAvailability?reference=${data.reference}`)
             loadListings();

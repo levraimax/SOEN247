@@ -57,14 +57,3 @@ function formatPhone(input) {
 function validEmail(input) {
     return /^[\w]+@([\w]{1,}\.)[\w]{1,}$/.test(input.value);
 }
-
-//function saveData(event) {
-//    // Post to server instead
-//    if (event.target[0].valid == undefined || event.target[0].valid) {
-//        let user = localStorage.getItem('user');
-//        let serverData = JSON.parse(localStorage.getItem("serverData"));
-//        serverData[user][event.target[0].name] = event.target[0].value;
-//        localStorage.setItem('serverData', JSON.stringify(serverData));
-//    }
-//    return false;
-//}
